@@ -73,7 +73,7 @@ function log(id){var L=ld('mc:log',[]);L.push([Date.now(),id]);sv('mc:log',L.sli
 function act(){var L=ld('mc:log',[]),day=864e5,t0=new Date().setHours(0,0,0,0),bars=[0,0,0,0,0,0,0],td=0,tc={};
   L.forEach(function(e){var a=Math.round((t0-new Date(e[0]).setHours(0,0,0,0))/day);if(a===0)td++;if(a>=0&&a<7){bars[6-a]++;tc[e[1]]=(tc[e[1]]||0)+1}});
   var top=Object.keys(tc).sort(function(a,b){return tc[b]-tc[a]}).slice(0,3),mx=Math.max.apply(null,bars.concat(1));
-  $('#act').innerHTML='<div class="act-h"><b>'+(td?'You opened '+td+' project'+(td>1?'s':'')+' today':'No projects opened today yet')+'</b><small>Private · stored only on this device</small></div><div class="bars">'+bars.map(function(n,k){return'<i style="--h:'+Math.max(8,n/mx*100)+'%" title="'+n+' opens"><u>'+'SMTWTFS'.charAt(new Date(t0-(6-k)*day).getDay())+'</u></i>'}).join('')+'</div><div class="top">'+(top.length?top.map(function(i){var x=byId(i);return'<span class="chip glass">'+(x?x.n:i)+' · '+tc[i]+'</span>'}).join(''):'<span class="muted">Your most-used tools will appear here.</span>')+'</div>'}
+  $('#act').innerHTML='<div class="act-h"><b>'+(td?'You opened '+td+' project'+(td>1?'s':'')+' today':'No projects opened today yet')+'</b><small>Private · stored only on this device</small></div><div class="bars'+(L.length?'':' empty')+'">'+bars.map(function(n,k){return'<i style="--h:'+Math.max(8,n/mx*100)+'%" title="'+n+' opens"><u>'+'SMTWTFS'.charAt(new Date(t0-(6-k)*day).getDay())+'</u></i>'}).join('')+'</div><div class="top">'+(top.length?top.map(function(i){var x=byId(i);return'<span class="chip glass">'+(x?x.n:i)+' · '+tc[i]+'</span>'}).join(''):'<span class="muted">Your most-used tools will appear here.</span>')+'</div>'}
 act();
 
 /* Reveal + active nav */
