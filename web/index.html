@@ -195,13 +195,12 @@ footer{border-top:1px solid var(--rule);padding:28px 0 max(28px,calc(env(safe-ar
   *,*::before,*::after{animation-duration:.001ms!important;animation-delay:0s!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
 }
 
-/* Privacy & Network collection: distinct animated brand treatments. */
-.card.project-quick-link .icon,.card.project-nextdns .icon{transition:transform .65s cubic-bezier(.2,.8,.2,1),filter .65s ease;}
-.card.project-quick-link:hover .icon{transform:rotate(-8deg) scale(1.09);filter:drop-shadow(0 0 18px rgba(182,243,107,.42));}
-.card.project-nextdns:hover .icon{transform:rotate(8deg) scale(1.09);filter:drop-shadow(0 0 18px rgba(112,214,255,.5));}
-.card.project-quick-link:before,.card.project-nextdns:before{content:"";position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;opacity:0;transition:opacity .45s ease;background:radial-gradient(circle at 90% 0%,color-mix(in srgb,var(--c1) 22%,transparent),transparent 52%);}
-.card.project-quick-link:hover:before,.card.project-nextdns:hover:before{opacity:1;}
-@media(prefers-reduced-motion:reduce){.card.project-quick-link .icon,.card.project-nextdns .icon{transition:none;}}
+/* One parent collection card; individual Quick Link and NextDNS cards live inside its workspace. */
+.card.project-privacy-network .icon{transition:transform .42s cubic-bezier(.2,.8,.2,1),filter .42s ease;}
+.card.project-privacy-network:hover .icon{transform:translateY(-3px) scale(1.045);filter:drop-shadow(0 0 14px rgba(150,220,180,.24));}
+.card.project-privacy-network:before{content:"";position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;opacity:0;transition:opacity .35s ease;background:radial-gradient(circle at 90% 0%,rgba(150,220,180,.12),transparent 52%);}
+.card.project-privacy-network:hover:before{opacity:1;}
+@media(prefers-reduced-motion:reduce){.card.project-privacy-network .icon{transition:none;}}
 </style>
 
 <style id="mahi-device-polish">
@@ -245,7 +244,7 @@ button,a,[role="button"],input[type="button"],input[type="submit"]{-webkit-tap-h
 .hero-index b{font-weight:500;font-size:15px;letter-spacing:-.01em;transition:color .3s var(--ease)}
 .hero-index small{font-size:12px;color:var(--faint)}
 .hero-index a:hover b,.hero-index a:focus-visible b{color:var(--mc-accent-hi)}
-@media(min-width:721px){.skip{left:auto;right:calc(var(--mc-gutter) + 66px);transform:none}}  /* clear of the Quick Add button */
+@media(min-width:721px){.skip{left:auto;right:var(--mc-gutter);transform:none}}
 @media(min-width:721px) and (max-width:1000px) and (orientation:portrait){h1{font-size:clamp(72px,12.5vw,124px)}}
 @media(max-width:720px){.hero-index{display:none}}
 .store{border-radius:var(--mc-r-lg) var(--mc-r-lg) 0 0;background:linear-gradient(180deg,#19191a 0,var(--mc-bg) 420px);border-top:1px solid var(--mc-line-strong)}
@@ -291,8 +290,8 @@ button,a,[role="button"],input[type="button"],input[type="submit"]{-webkit-tap-h
 </style>
 
 <style id="mc-center-layout-fix">
-/* Center alignment pass: presentation-only overrides. Keep the hero/video scrub,
-   live project data, search/filter handlers, destinations and Quick Add intact. */
+/* Center alignment pass: presentation-only overrides. Keep the hero scrub,
+   live project data, search/filter handlers and destinations intact. */
 .wrap{width:min(var(--mc-container),calc(100% - var(--mc-gutter) - var(--mc-gutter)));margin-inline:auto}
 .chrome{left:0;right:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:max(12px,calc(env(safe-area-inset-top,0px) + 8px)) var(--mc-gutter) 12px;text-align:center}
 .mark{justify-content:center;margin-inline:auto;text-align:center}
@@ -875,10 +874,8 @@ var projects = [
    desc:"A growing library of practical Windows scripts, workflow helpers and ready-to-run utilities.", tags:["Windows","Automation","Scripts"], c1:"#d7ff79", c2:"#5fcf4a", glyph:"terminal", ink:"#10150a"},
   {id:"social-cleaner", title:"Social Media Tools", cat:"util", catLabel:"Instagram tools", status:"Available", url:"/instagram-cleaner.html", local:true,
    desc:"An Instagram workspace for account cleanup and local data insights. The original dashboard stays available alongside this portfolio.", tags:["Instagram","Dashboard","Flask"], c1:"#b57bff", c2:"#ff5fb2", glyph:"social"},
-  {id:"quick-link", title:"Quick Link", cat:"privacy", catLabel:"Privacy & Network", status:"External link", url:"https://tinyurl.com/ypy5x9wv", local:false, repo:"https://tinyurl.com/ypy5x9wv",
-   desc:"A saved short link, kept in its own privacy and network collection. The destination is opened externally.", tags:["Short link","External","One tap"], c1:"#b6f36b", c2:"#1a9c8c", glyph:"link"},
-  {id:"nextdns", title:"NextDNS Endpoint", cat:"privacy", catLabel:"Privacy & Network", status:"Endpoint", url:"https://f1388b.dns.nextdns.io", local:false, repo:"https://nextdns.io/",
-   desc:"Your provided NextDNS hostname, available as a quick-access card for network and DNS configuration.", tags:["NextDNS","DNS","Network"], c1:"#70d6ff", c2:"#5b4bdb", glyph:"dns"}
+  {id:"privacy-network", title:"Privacy & Network", cat:"privacy", catLabel:"Privacy & Network", status:"Available", url:"#privacy", local:true,
+   desc:"One private-access workspace for your saved Quick Link and NextDNS endpoint, with separate copy and open actions.", tags:["Quick Link","NextDNS","Network"], c1:"#c9f77a", c2:"#70d6ff", glyph:"shield"}
 ];
 var N = projects.length;
 
@@ -965,8 +962,8 @@ function readScroll(){
   scheduleFrame();
 }
 
-/* ===== Hero scene (replaces the stock video): a procedural canvas scrubbed by scroll.
-   Icons orbit the M mark, then dock like an app-store dock. Driven by seekAt, which eases toward the scroll target. ===== */
+/* ===== Hero scene: a lightweight canvas scrubbed directly by scroll progress.
+   Icons orbit the M mark, then dock like an app-store dock. Scroll events are coalesced to one frame. ===== */
 var imgs=[], logo=new Image(), loaded=0, total=N+1;
 function setProgress(f){ bootBar.style.transform="scaleX("+f+")"; bootPct.textContent="LOADING "+Math.round(f*100)+"%"; }
 function onAsset(){ loaded++; needDraw=true; setProgress(loaded/total); if(loaded>=total) start(); else scheduleFrame(); }
@@ -983,7 +980,7 @@ setTimeout(start,1600); /* never strand the page behind the preloader */
 function resize(){
   var w=window.innerWidth, h=window.innerHeight;
   if(w===W && Math.abs(h-H)<90) return; /* ignore mobile URL-bar resizes */
-  W=w; H=h; DPR=Math.min(window.devicePixelRatio||1,w<=720?1:1.15);
+  W=w; H=h; DPR=1; /* Keep the scroll-scrubbed canvas at CSS-pixel resolution to prevent Retina redraw jank. */
   cv.width=Math.round(W*DPR); cv.height=Math.round(H*DPR); if(ctx) ctx.setTransform(DPR,0,0,DPR,0,0); needDraw=true;
   scheduleFrame();
 }
@@ -1024,7 +1021,7 @@ function draw(t,time){
     var it=items[k], im=imgs[it.i];
     if(it.s<1 || !im.complete || !im.naturalWidth) continue;
     ctx.save(); ctx.globalAlpha=clamp(it.a,0,1);
-    ctx.shadowColor=projects[it.i].c1; ctx.shadowBlur=W<=720?0:Math.min(10,8*it.a); ctx.drawImage(im,it.x-it.s/2,it.y-it.s/2,it.s,it.s); ctx.restore();
+    ctx.shadowBlur=0; /* Canvas shadowBlur is expensive during scroll; the scene glow supplies depth instead. */ ctx.drawImage(im,it.x-it.s/2,it.y-it.s/2,it.s,it.s); ctx.restore();
   }
 }
 
@@ -1183,7 +1180,7 @@ resize(); measure(); readScroll(); build(); moveGlider(); scheduleFrame();
  var configs={home:{title:"Home",description:"The things I am working on, all in one place."},projects:{title:"Projects",description:"Browse the projects I have made."},apps:{title:"Apps",description:"Browse your apps without leaving MahiCloud.",src:"/apps/"},windows:{title:"Windows Tools",description:"Your Windows automation workspace.",src:"/linkora/"},movies:{title:"Movies",description:"Explore your movie and series directory.",src:"/mahiflix/"},social:{title:"Social Tools",description:"Your social-media utility workspace.",src:"/instagram-cleaner.html"},legal:{title:"Privacy Policy",description:"MahiCloud privacy information.",src:"/privacy"},privacy:{title:"Privacy & Network",description:"Saved links and network endpoints, together in one tab."}};
  var appView=document.getElementById("mcAppView"),titleEl=document.getElementById("mcViewTitle"),descEl=document.getElementById("mcViewDescription"),kickerEl=document.getElementById("mcViewKicker"),stateEl=document.getElementById("mcViewState"),stateBadge=stateEl&&stateEl.parentElement,reloadBtn=document.getElementById("mcReloadButton"),panels=Array.prototype.slice.call(document.querySelectorAll("[data-mc-frame-panel]"));
  var activeRoute="home",activePanel=null,returnScrollY=0,toastTimer=0,reduced=!!(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches),mainTitle=document.title;
- var projectRoutes={mahiflix:"movies",apps:"apps",linkora:"windows","social-cleaner":"social"};
+ var projectRoutes={mahiflix:"movies",apps:"apps",linkora:"windows","social-cleaner":"social","privacy-network":"privacy"};
  function makeProjectNavItem(project,mobile){
   var a=document.createElement("a"),route=projectRoutes[project.id];
   a.setAttribute("data-mc-project",project.id);
@@ -1222,7 +1219,7 @@ resize(); measure(); readScroll(); build(); moveGlider(); scheduleFrame();
  function shellTop(){var h=document.getElementById("chrome");if(!h)return;var r=h.getBoundingClientRect(),mob=matchMedia("(max-width: 720px)").matches,routeGap=activeRoute==="movies"?8:0;document.documentElement.style.setProperty("--mc-shell-top",Math.max(mob?84:112,Math.ceil(r.bottom+(mob?7:12)+routeGap))+"px");}
  function refreshHome(){window.dispatchEvent(new Event("resize"));window.dispatchEvent(new Event("scroll"));}
  function navigate(route,opts){opts=opts||{};if(!configs[route])route="home";var previousRoute=activeRoute;var wasOverlay=document.body.classList.contains("mc-route-active");if(previousRoute&&previousRoute!==route&&previousRoute!=="home"&&previousRoute!=="projects")setFrameVisibility(previousRoute,false);if(!wasOverlay)returnScrollY=window.scrollY||window.pageYOffset||0;if(!opts.fromHistory){var hash=route==="projects"?"projects":route;if(location.hash!=="#"+hash){try{history.pushState({mcRoute:route},"",location.pathname+location.search+"#"+hash);}catch(e){}}}activeRoute=route;tabs(route);heading(route);var overlay=route!=="home"&&route!=="projects";if(!overlay){document.body.classList.remove("mc-route-active");appView.hidden=true;requestAnimationFrame(function(){if(route==="projects"){var p=document.getElementById("projects");if(p)p.scrollIntoView({behavior:reduced?"auto":"smooth",block:"start"});}else window.scrollTo(0,wasOverlay?returnScrollY:0);refreshHome();});return;}shellTop();document.body.classList.add("mc-route-active");appView.hidden=false;status("READY",false);activate(route);if(route!=="privacy")ensureFrame(route);else status("READY",false);}
- document.addEventListener("click",function(ev){if(ev.defaultPrevented||ev.button!==0||ev.metaKey||ev.ctrlKey||ev.shiftKey||ev.altKey)return;var n=ev.target,copyBtn=n&&n.closest?n.closest("[data-mc-copy]"):null;if(copyBtn){ev.preventDefault();copy(copyBtn.getAttribute("data-mc-copy")||"");return;}var a=n&&n.closest?n.closest("a[href]"):null;if(!a)return;var special=a.closest(".project-quick-link,.project-nextdns");if(special&&!a.classList.contains("src")){ev.preventDefault();navigate("privacy");return;}if(a.getAttribute("target")==="_blank"||a.hasAttribute("download"))return;var r=routeForAnchor(a);if(r){ev.preventDefault();navigate(r);}},true);
+ document.addEventListener("click",function(ev){if(ev.defaultPrevented||ev.button!==0||ev.metaKey||ev.ctrlKey||ev.shiftKey||ev.altKey)return;var n=ev.target,copyBtn=n&&n.closest?n.closest("[data-mc-copy]"):null;if(copyBtn){ev.preventDefault();copy(copyBtn.getAttribute("data-mc-copy")||"");return;}var a=n&&n.closest?n.closest("a[href]"):null;if(!a)return;var special=a.closest(".project-privacy-network");if(special&&!a.classList.contains("src")){ev.preventDefault();navigate("privacy");return;}if(a.getAttribute("target")==="_blank"||a.hasAttribute("download"))return;var r=routeForAnchor(a);if(r){ev.preventDefault();navigate(r);}},true);
  if(reloadBtn)reloadBtn.addEventListener("click",function(){if(activeRoute==="privacy"){toast("Privacy & Network is up to date");return;}var p=panelFor(activeRoute),f=p&&p.querySelector("iframe");if(!f)return;var loader=p.querySelector(".mc-frame-loader");if(loader)loader.classList.remove("is-dismissed");status("RELOADING",true);if(f.contentWindow&&f.getAttribute("src")){try{f.contentWindow.location.reload();}catch(e){f.setAttribute("src",f.getAttribute("src"));}}else ensureFrame(activeRoute);});
  window.addEventListener("popstate",function(){navigate(routeFromHash(),{fromHistory:true});});window.addEventListener("resize",shellTop,{passive:true});
  window.addEventListener("load",function(){shellTop();if(document.fonts&&document.fonts.ready)document.fonts.ready.then(shellTop);var desired=routeFromHash();if(desired!==activeRoute)navigate(desired,{fromHistory:true});},{once:true});
