@@ -321,3 +321,18 @@ html body #mahi-catalog-plus{background:rgba(20,20,20,.58)!important;color:var(-
 html body #mahi-catalog-plus .mc-catalog-plus-icon{background:rgba(255,255,255,.08)!important;box-shadow:none!important}
 html body #mahi-catalog-plus:hover{background:rgba(255,255,255,.09)!important;box-shadow:0 8px 24px rgba(0,0,0,.3)!important}
 @media(max-width:700px){.hero{padding-top:100px}.hero .avatar{width:72px;height:72px}.topnav{gap:8px}.links{gap:2px}.links a{padding:7px 8px;font-size:13px}}
+
+
+/* Shared control variants and compact design tokens */
+:where(button,input,.card,.win,.file,.ic,.perk,.cmd-box,.ctx,.tm,.det-box,.sug,.sg,.sc,.chp,.hero2,.store-bar,.sheet-bar,.toast,.search,.soc .circle,.tabs button,.dock,.bd,.bd2,.chip,.status-badge){border-radius:var(--mc-radius-md)}
+:where(.pill,.tabs button,.chp,.ctx button,.circle){transition:background-color .2s,color .2s,border-color .2s}
+:where(.pill,.tabs button,.chp,.ctx button){border:1px solid transparent}
+.pill.red{background:linear-gradient(180deg,rgba(var(--ac),.9),rgba(var(--ad),.9));color:#fff}
+.pill:not(.red){background:rgba(255,255,255,.055)}
+.circle{border-radius:50%!important}
+.pill{border-radius:var(--mc-radius-pill)!important}
+.avatar,.avatar img,.dots i,.bg i,.spot,.sw i{border-radius:50%!important}
+:where(.pill,.circle,.tabs button,.chp,.ctx button){font-size:14px}
+:where(.nm,.ty,.perk p,.cmd-i small,.sg small,.sc small){font-size:12px}
+:where(.path,.perk p,.det dd,.sub){font-size:14px}
+:where(h1){font-size:clamp(34px,6.4vw,64px)}
