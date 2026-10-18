@@ -965,7 +965,7 @@ function readScroll(){
 
 /* ===== Hero scene (replaces the stock video): a procedural canvas scrubbed by scroll.
    Icons orbit the M mark, then dock like an app-store dock. Driven by seekAt, which eases toward the scroll target. ===== */
-var imgs=[], logo=new Image(), loaded=0, total=N+1;
+var imgs=[], orbitItems=projects.map(function(_,i){return {i:i,z:0,x:0,y:0,s:0,a:0};}), logo=new Image(), loaded=0, total=N+1;
 function setProgress(f){ bootBar.style.transform="scaleX("+f+")"; bootPct.textContent="LOADING "+Math.round(f*100)+"%"; }
 function onAsset(){ loaded++; needDraw=true; setProgress(loaded/total); if(loaded>=total) start(); else scheduleFrame(); }
 function start(){
@@ -1008,14 +1008,15 @@ function draw(t,time){
   /* dock geometry */
   var ds=clamp((W-36)/N-8,28,58), gap=8, dw=N*(ds+gap)-gap, dx0=(W-dw)/2, dy=H-Math.max(92,H*0.0+92);
   if(m2>0){ ctx.globalAlpha=m2*.9; rr(ctx,dx0-14,dy-ds/2-12,dw+28,ds+24,22); ctx.fillStyle="rgba(255,255,255,.06)"; ctx.fill(); ctx.strokeStyle="rgba(255,255,255,.10)"; ctx.stroke(); ctx.globalAlpha=1; }
-  var isz=clamp(m*.12,44,86), items=[];
+  var isz=clamp(m*.12,44,86), items=orbitItems;
   for(var i=0;i<N;i++){
     var a=(i/N)*Math.PI*2 + t*Math.PI*1.5;
-    var z=Math.sin(a), d=z*.5+.5;
+    var z=Math.sin(a), depth=z*.5+.5;
     var ox=cx+Math.cos(a)*rx*e, oy=cy+Math.sin(a)*ry*e;
-    var os=isz*(.72+.28*d)*e, oa=(.28+.6*d)*e;
-    var tx=dx0+i*(ds+gap)+ds/2;
-    items.push({i:i,z:z,x:lerp(ox,tx,m2),y:lerp(oy,dy,m2),s:lerp(os,ds,m2),a:lerp(oa,1,m2)});
+    var os=isz*(.72+.28*depth)*e, oa=(.28+.6*depth)*e;
+    var tx=dx0+i*(ds+gap)+ds/2, it=items[i];
+    it.z=z; it.x=lerp(ox,tx,m2); it.y=lerp(oy,dy,m2);
+    it.s=lerp(os,ds,m2); it.a=lerp(oa,1,m2);
   }
   items.sort(function(p,q){ return p.z-q.z; });
   for(var k=0;k<items.length;k++){
