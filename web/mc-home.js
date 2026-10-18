@@ -27,8 +27,10 @@ function render(){
   else if(st.cat!=='all')list=ITEMS.filter(function(x){return x.k===st.cat});
   if(q)list=list.filter(function(x){return(x.n+' '+x.s+' '+x.t+' '+x.k+' '+(x.b||'')).toLowerCase().indexOf(q)>-1});
   files.className='files'+(st.view==='list'?' list':'');files.setAttribute('aria-busy','false');
-  files.innerHTML=list.length?list.map(function(x,k){var p=pins.indexOf(x.id)>-1,s=x.b||'live',
-    var category={apps:'Apps',movies:'Movies',tools:'Tools',social:'Social',privacy:'Privacy'}[x.k]||x.t;\n     inn='<span class="ic" style="--c1:'+x.c[0]+';--c2:'+x.c[1]+'" aria-hidden="true">'+ico(x)+'</span><span class="tx"><span class="nm">'+x.n+'</span><span class="ds">'+x.s+'</span></span><span class="ty">'+category+'</span>'+(x.b==='soon'?'<span class="status-badge soon">Coming soon</span>':x.b==='beta'?'<span class="status-badge">Beta</span>':'');
+  files.innerHTML=list.length?list.map(function(x,k){
+    var p=pins.indexOf(x.id)>-1,s=x.b||'live',
+        category={apps:'Apps',movies:'Movies',tools:'Tools',social:'Social',privacy:'Privacy'}[x.k]||x.t,
+        inn='<span class="ic" style="--c1:'+x.c[0]+';--c2:'+x.c[1]+'" aria-hidden="true">'+ico(x)+'</span><span class="tx"><span class="nm">'+x.n+'</span><span class="ds">'+x.s+'</span></span><span class="ty">'+category+'</span>'+(x.b==='soon'?'<span class="status-badge soon">Coming soon</span>':x.b==='beta'?'<span class="status-badge">Beta</span>':'');
     return'<div class="file'+(s==='soon'?' soon':'')+'" role="listitem" style="animation-delay:'+k*45+'ms">'+
     (x.h?'<a class="fl" href="'+x.h+'" data-sheet data-id="'+x.id+'" data-title="'+x.n+'">'+inn+'</a><button class="pin" data-pin="'+x.id+'" aria-pressed="'+p+'" aria-label="'+(p?'Unpin ':'Pin ')+x.n+'">'+(p?'★':'☆')+'</button>':'<div class="fl" aria-disabled="true">'+inn+'</div>')+'</div>'}).join('')
    :'<div class="empty"><b>'+(st.cat==='pinned'?'☆':st.cat==='recent'?'◷':'⌕')+'</b>'+(st.cat==='pinned'?'Nothing pinned yet — tap ☆ on any project.':st.cat==='recent'?'Projects you open will show up here.':'No matches. Try another word.')+'</div>';
