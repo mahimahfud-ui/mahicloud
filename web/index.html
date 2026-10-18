@@ -6,6 +6,7 @@
 <title>MahiCloud — Apps, tools &amp; privacy by Mahi</title>
 <meta name="description" content="A free library of apps, tools, movie directories and privacy services by Mahi — open instantly on any device.">
 <meta name="theme-color" content="#0a0a0a">
+<script>try{var t=localStorage.getItem('mc:theme');if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
 <link rel="manifest" href="/manifest.json">
 <meta property="og:type" content="website"><meta property="og:title" content="MahiCloud — apps, tools &amp; privacy by Mahi"><meta property="og:description" content="A free library of apps, tools, movie directories and privacy services."><meta property="og:image" content="/mahi-profile.jpg"><meta name="twitter:card" content="summary">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -21,8 +22,8 @@
 
 <header class="topnav glass">
   <a class="brand" href="/" aria-label="MahiCloud home"><img src="/brand-m.webp" alt="" width="28" height="28"><b>MahiCloud</b></a>
-  <nav class="links" aria-label="Primary"><a href="#home" class="on">Home</a><a href="#library" data-store>Library</a><a href="#why">Why MahiCloud</a><a href="#privacy">Privacy</a></nav>
-  <button class="glass pill sm" id="inst" type="button" hidden>Install</button><button class="glass pill sm" id="kbd" type="button" aria-label="Open command palette">Command <kbd>/</kbd></button>
+  <nav class="links" aria-label="Primary"><a href="#home" class="on">Home</a><a href="#library" data-store>Library</a><a href="#why" data-why>Why MahiCloud</a><a href="/privacy" data-sheet data-title="Privacy Policy">Privacy</a></nav>
+  <span class="tr"><button class="glass circle" id="themeBtn" type="button" aria-label="Change theme" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" width="18" height="18"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5a8.5 8.5 0 010 17z" fill="currentColor"/></svg></button><button class="glass pill sm" id="inst" type="button" hidden>Install</button><button class="glass pill sm" id="kbd" type="button" aria-label="Open command palette">Command <kbd>/</kbd></button></span>
 </header>
 
 <main>
@@ -49,22 +50,17 @@
     <noscript><p>Open: <a href="/apps/">Apps</a> · <a href="/mahiflix/">MahiFlix</a> · <a href="/linkora/">Tools</a> · <a href="/mahi-ai/">Mahi AI</a></p></noscript>
   </section>
 
-  <section id="why" class="block">
-    <h2 class="reveal">Why MahiCloud</h2>
-    <div class="perks" id="perks"></div>
-  </section>
-
   <section id="activity" class="block"><h2 class="reveal">Your activity</h2><div class="card act reveal" id="act"></div></section>
 
   <section id="privacy" class="block">
     <div class="card wide reveal"><h2>DNS, Network &amp; Privacy</h2><p>Services that keep browsing safer are collected here as they are built. Have an idea or need a tool?</p>
-      <div class="cta"><a class="glass pill red" href="https://www.instagram.com/mahimahfud/" target="_blank" rel="noopener noreferrer">Request a tool</a><a class="glass pill" href="/privacy" data-sheet data-title="Privacy Policy">Privacy policy</a></div></div>
+      <div class="cta"><a class="glass pill red" href="https://wa.me/8801819856148?text=Hi%20Mahi%2C%20I%20want%20to%20request%20a%20tool%3A%20" target="_blank" rel="noopener noreferrer">Request a tool</a><a class="glass pill" href="/privacy" data-sheet data-title="Privacy Policy">Privacy policy</a></div></div>
   </section>
 </main>
 
 <footer class="foot"><span>© MahiCloud</span><nav aria-label="Footer"><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="https://www.instagram.com/mahimahfud/" target="_blank" rel="noopener noreferrer">Instagram</a></nav></footer>
 
-<nav class="dock glass" aria-label="Mobile"><a href="#home" class="on"><i>⌂</i>Home</a><a href="#library" data-store><i>▦</i>Library</a><a href="#why"><i>★</i>Why</a><a href="#privacy"><i>⛨</i>Privacy</a></nav>
+<nav class="dock glass" aria-label="Mobile"><a href="#home" class="on"><i>⌂</i>Home</a><a href="#library" data-store><i>▦</i>Library</a><a href="#why" data-why><i>★</i>Why</a><a href="/privacy" data-sheet data-title="Privacy Policy"><i>⛨</i>Privacy</a></nav>
 
 <div class="sheet" id="sheet" hidden role="dialog" aria-modal="true" aria-label="Viewer">
   <div class="sheet-bar glass"><button class="glass circle" id="sheetClose" aria-label="Close">✕</button><span class="tt"><b id="sheetTitle">MahiCloud</b><small id="sheetPath"></small></span><span class="sb"><button class="glass circle" id="sheetReload" aria-label="Reload">↻</button><button class="glass circle" id="sheetShare" aria-label="Share link">⇪</button><a class="glass circle" id="sheetOpen" target="_blank" rel="noopener" aria-label="Open in new tab">↗</a></span></div>
@@ -76,7 +72,10 @@
 <div class="det" id="det" hidden role="dialog" aria-modal="true" aria-label="Project details"></div>
 <div class="ctx glass" id="ctx" hidden role="menu"></div>
 <button class="glass pill sm zenx" id="zenx" type="button" hidden>Exit Zen</button>
+<div class="store" id="whyp" hidden role="dialog" aria-modal="true" aria-label="Why MahiCloud"><div class="store-bar glass"><button class="glass circle" id="whyClose" aria-label="Back">←</button><b>Why MahiCloud</b><span class="circle" style="visibility:hidden"></span></div><div class="store-body" id="whyBody"><div class="lt">Why MahiCloud</div><p class="lead">Built for everyday people. Here is what you get.</p><div class="perks" id="perks"></div></div></div>
+<div class="tm glass" id="themeMenu" hidden role="dialog" aria-label="Theme"><h4>Theme</h4><small>Changes the site for everyone, live.</small><div class="sw" id="sw"></div></div>
 <div class="toast" id="toast" role="status"></div>
 <script src="/mc-home.js" defer></script>
+<script src="/quick-add.js" defer></script>
 </body>
 </html>

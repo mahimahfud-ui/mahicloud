@@ -8,7 +8,6 @@ function sv(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
 var ITEMS=[{id:'apps',n:'Apps',t:'Collection',k:'apps',h:'/apps/',s:'Phone & desktop apps',b:'live',p:['Android','Windows','Web'],d:'A growing collection of apps built by Mahi for phone and desktop.',g:'<rect x="4" y="4" width="6" height="6" rx="1.5"/><rect x="14" y="4" width="6" height="6" rx="1.5"/><rect x="4" y="14" width="6" height="6" rx="1.5"/><rect x="14" y="14" width="6" height="6" rx="1.5"/>',c:['#3b82f6','#1e40af']},
 {id:'flix',n:'MahiFlix',t:'Movies',k:'movies',h:'/mahiflix/',s:'Movie & web series directory',b:'live',p:['Web'],d:'A directory of movie and web-series apps and websites in one place.',g:'<rect x="3" y="5" width="18" height="14" rx="3"/><path d="M10 9l5 3-5 3z"/>',c:['#e50914','#7a0309']},
 {id:'tools',n:'Win · Linux · iOS',t:'Tools',k:'tools',h:'/linkora/',s:'Tools for every platform',b:'live',p:['Windows','Linux','iOS','Web'],d:'Handy tools and utilities for Windows, Linux and iOS.',g:'<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/>',c:['#22d3ee','#0e7490']},
-{id:'ai',n:'Mahi AI',t:'Assistant',k:'tools',h:'/mahi-ai/',s:'Find the right tool fast',b:'beta',p:['Web'],d:'An assistant that helps you find the right MahiCloud tool quickly.',g:'<path d="M12 3l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/>',c:['#a855f7','#5b21b6']},
 {id:'lumr',n:'Lumr',t:'Tool',k:'tools',h:'/lumr/',s:'Lightweight utility',b:'live',p:['Web'],d:'A lightweight utility that opens instantly in your browser.',g:'<circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 010 16z" fill="#fff"/>',c:['#fbbf24','#b45309']},
 {id:'igc',n:'Instagram Cleaner',t:'Social',k:'social',h:'/instagram-cleaner.html',s:'Clean up your account',b:'live',p:['Web'],d:'Helps you tidy up your Instagram account activity.',g:'<path d="M5 7h14M9 7V5h6v2M7 7l1 12h8l1-12"/>',c:['#f43f8e','#9d174d']},
 {id:'unf',n:'Unfollowers',t:'Social',k:'social',h:'/unfollowers/',s:'See who unfollowed you',b:'live',p:['Web'],d:'Check who stopped following you.',g:'<circle cx="10" cy="8" r="3.5"/><path d="M3 20c0-4 3-6 7-6s7 2 7 6M17 9l4 4M21 9l-4 4"/>',c:['#fb923c','#c2410c']},
@@ -29,8 +28,8 @@ function render(){
   if(q)list=list.filter(function(x){return(x.n+' '+x.s+' '+x.t+' '+x.k+' '+(x.b||'')).toLowerCase().indexOf(q)>-1});
   files.className='files'+(st.view==='list'?' list':'');files.setAttribute('aria-busy','false');
   files.innerHTML=list.length?list.map(function(x,k){var p=pins.indexOf(x.id)>-1,s=x.b||'live',
-    inn='<span class="ic" style="--c1:'+x.c[0]+';--c2:'+x.c[1]+'" aria-hidden="true">'+ico(x)+'</span><span class="tx"><span class="nm">'+x.n+'</span><span class="ds">'+x.s+'</span></span><span class="ty">'+x.t+'</span>';
-    return'<div class="file'+(s==='soon'?' soon':'')+'" role="listitem" style="animation-delay:'+k*45+'ms"><span class="bd '+s+'">'+LB[s]+'</span>'+(x.h?hd(x):'')+
+    inn='<span class="ic" style="--c1:'+x.c[0]+';--c2:'+x.c[1]+'" aria-hidden="true">'+ico(x)+'</span><span class="tx"><span class="nm">'+x.n+'</span><span class="ds">'+x.s+'</span></span><span class="ty">'+(x.b==='soon'?'Soon':x.t)+'</span>';
+    return'<div class="file'+(s==='soon'?' soon':'')+'" role="listitem" style="animation-delay:'+k*45+'ms">'+
     (x.h?'<a class="fl" href="'+x.h+'" data-sheet data-id="'+x.id+'" data-title="'+x.n+'">'+inn+'</a><button class="pin" data-pin="'+x.id+'" aria-pressed="'+p+'" aria-label="'+(p?'Unpin ':'Pin ')+x.n+'">'+(p?'★':'☆')+'</button>':'<div class="fl" aria-disabled="true">'+inn+'</div>')+'</div>'}).join('')
    :'<div class="empty"><b>'+(st.cat==='pinned'?'☆':st.cat==='recent'?'◷':'⌕')+'</b>'+(st.cat==='pinned'?'Nothing pinned yet — tap ☆ on any project.':st.cat==='recent'?'Projects you open will show up here.':'No matches. Try another word.')+'</div>';
   $('#count').textContent=list.length+' item'+(list.length===1?'':'s')+' · '+pins.length+' pinned';
@@ -43,7 +42,7 @@ $$('[data-view]').forEach(function(b){b.addEventListener('click',function(){st.v
 $('#q').addEventListener('input',function(e){st.q=e.target.value;if(st.q&&st.cat!=='all')st.cat='all';render()});
 
 files.addEventListener('click',function(e){var b=e.target.closest('.pin');if(!b)return;e.preventDefault();var i=b.dataset.pin,k=pins.indexOf(i);k>-1?pins.splice(k,1):pins.unshift(i);sv('mc:pins',pins);toast(k>-1?'Unpinned':'Pinned to your library');render()});
-function go(id){d.getElementById(id).scrollIntoView({behavior:RM?'auto':'smooth'})}
+function go(id){if(id==='why'){openWhy();return}var n=d.getElementById(id);if(n)n.scrollIntoView({behavior:RM?'auto':'smooth'})}
 $('#kbd').addEventListener('click',openCmd);
 
 /* Sheet viewer */
@@ -83,7 +82,7 @@ if('IntersectionObserver' in window){
   var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.12});
   els.forEach(function(el,i){el.style.setProperty('--i',i%3);io.observe(el)});
   var links=$$('.links a,.dock a'),so=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting)links.forEach(function(a){a.classList.toggle('on',a.getAttribute('href')==='#'+e.target.id)})})},{rootMargin:'-45% 0px -50% 0px'});
-  ['home','library','why','privacy'].forEach(function(i){so.observe(d.getElementById(i))});
+  ['home','library','privacy'].forEach(function(i){var n=d.getElementById(i);if(n)so.observe(n)});
 }else els.forEach(function(el){el.classList.add('in')});
 /* ---------- Premium layer ---------- */
 var spot=$('.spot'),mag=null,til=null,raf=0,ev;
@@ -103,7 +102,7 @@ function acts(){var A=[['home','Home','⌂'],['library','Library','▦'],['why',
   A.push({n:st.view==='grid'?'Switch to list view':'Switch to grid view',t:'Action',i:'☰',f:function(){st.view=st.view==='grid'?'list':'grid';sv('mc:view',st.view);render()}},
    {n:'Show pinned projects',t:'Action',i:'☆',f:function(){st.cat='pinned';render();go('library')}},
    {n:'Show recently opened',t:'Action',i:'◷',f:function(){st.cat='recent';render();go('library')}},
-   {n:'Open Store',t:'Action',i:'▦',f:openStore},{n:'Toggle Zen mode',t:'Action',i:'◌',f:zen},{n:'Install MahiCloud',t:'Action',i:'⇩',f:install},{n:'Request a tool',t:'Action',i:'✚',f:function(){open('https://www.instagram.com/mahimahfud/','_blank','noopener')}},
+   {n:'Open Store',t:'Action',i:'▦',f:openStore},{n:'Toggle Zen mode',t:'Action',i:'◌',f:zen},{n:'Install MahiCloud',t:'Action',i:'⇩',f:install},{n:'Change theme',t:'Action',i:'◐',f:openTheme},{n:'Request a tool',t:'Action',i:'✚',f:function(){open('https://wa.me/8801819856148','_blank','noopener')}},
    {n:'Copy site link',t:'Action',i:'⎘',f:function(){if(navigator.clipboard)navigator.clipboard.writeText(location.origin).then(function(){toast('Link copied')})}});
   ITEMS.forEach(function(x){var b={live:'Live',beta:'Beta',soon:'Soon'}[x.b||'live'];A.push(x.h?{n:x.n,t:b,i:ico(x),s:x.s,f:function(){openSheet(x.h,x.id,x.n)}}:{n:x.n,t:'Coming soon',i:ico(x),s:x.s,f:function(){toast(x.n+' is coming soon')}})});return A}
 function cdraw(){var q=cq.value.toLowerCase().trim();cr=acts().filter(function(a){return!q||(a.n+' '+(a.s||'')+' '+a.t).toLowerCase().indexOf(q)>-1});ci=Math.min(ci,Math.max(0,cr.length-1));
@@ -119,7 +118,7 @@ cl.addEventListener('pointermove',function(e){var li=e.target.closest('.cmd-i');
 cmd.addEventListener('click',function(e){if(e.target===cmd)closeCmd()});
 d.addEventListener('keydown',function(e){var t=e.target.tagName,typing=t==='INPUT'||t==='TEXTAREA';
   if(((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k')||(e.key==='/'&&!typing)){e.preventDefault();cmd.hidden?openCmd():closeCmd()}
-  else if(e.key==='Escape'){if(!cmd.hidden)closeCmd();else if(!sheet.hidden)closeSheet();else if(!det.hidden)closeDet();else if(!store.hidden)closeStore();else ctx.hidden=true}});
+  else if(e.key==='Escape'){if(!cmd.hidden)closeCmd();else if(!sheet.hidden)closeSheet();else if(!det.hidden)closeDet();else if(!store.hidden)closeStore();else if(!whyp.hidden)closeWhy();else{ctx.hidden=true;tm.hidden=true}}});
 
 /* ---------- Store, details, status, PWA ---------- */
 var LB2={live:'Live',beta:'Beta',soon:'Soon'},HL={up:'Operational',slow:'Degraded',down:'Unavailable'};
@@ -128,13 +127,13 @@ function ic(x){return'<span class="ic" style="--c1:'+x.c[0]+';--c2:'+x.c[1]+'">'
 function hd(x){return'<i class="hd '+(x.hs||'')+'" data-id="'+x.id+'" title="'+(HL[x.hs]||'Checking…')+'"></i>'}
 function health(){var live=ITEMS.filter(function(x){return x.h}),n=0;
   if(!navigator.onLine){$('#hsum').textContent='Offline · saved shell';return}
-  live.forEach(function(x){var t=Date.now();fetch(x.h,{method:'HEAD',cache:'no-store'}).then(function(r){x.hs=r.status>=400?'down':Date.now()-t>2500?'slow':'up'},function(){x.hs='down'}).then(function(){
+  live.forEach(function(x){var t=Date.now();fetch(x.h,{method:'HEAD',cache:'no-store'}).then(function(r){x.hs=r.status>=500?'down':Date.now()-t>2500?'slow':'up'},function(){x.hs='down'}).then(function(){
     $$('.hd[data-id="'+x.id+'"]').forEach(function(e){e.className='hd '+x.hs;e.title=HL[x.hs]});
     if(++n===live.length){var bad=live.filter(function(y){return y.hs!=='up'}).length;$('#hsum').innerHTML='<span class="hs'+(bad?' warn':'')+'"></span>'+(bad?bad+' of '+n+' need attention':'All systems operational')}})})}
 var STC=[['apps','Apps'],['movies','Movies & Series'],['tools','Tools'],['social','Social'],['privacy','Privacy & Network']],sc='all',store=$('#store'),sbody=$('#storeBody'),det=$('#det'),ctx=$('#ctx'),cid='';
-function scard(x){return'<button class="sc" data-id="'+x.id+'">'+ic(x)+'<b>'+x.n+'</b><small>'+x.t+' · '+LB2[x.b||'live']+'</small>'+(x.h?hd(x):'')+'</button>'}
+function scard(x){return'<button class="sc" data-id="'+x.id+'">'+ic(x)+'<b>'+x.n+'</b><small>'+(x.b==='soon'?'Coming soon':x.t)+'</small></button>'}
 function shelf(t,l){return'<section class="shelf"><h3>'+t+'</h3><div class="row">'+l.map(scard).join('')+'</div></section>'}
-function drawStore(){var f=byId('flix'),h='<div class="chips2">'+[['all','All']].concat(STC).map(function(c){return'<button class="chp'+(sc===c[0]?' on':'')+'" data-sc="'+c[0]+'">'+c[1]+'</button>'}).join('')+'</div>';
+function drawStore(){var f=byId('flix'),h='<div class="lt">Store</div><div class="chips2">'+[['all','All']].concat(STC).map(function(c){return'<button class="chp'+(sc===c[0]?' on':'')+'" data-sc="'+c[0]+'">'+c[1]+'</button>'}).join('')+'</div>';
   if(sc==='all'){h+='<button class="hero2" data-id="'+f.id+'" style="--c1:'+f.c[0]+';--c2:'+f.c[1]+'"><span><small>Featured</small><b>'+f.n+'</b><em>'+f.s+'</em></span>'+ic(f)+'</button>';
     var r=rec[0]&&byId(rec[0]);if(r){var rel=ITEMS.filter(function(x){return x.k===r.k&&x.id!==r.id});if(rel.length)h+=shelf('Because you opened '+r.n,rel)}}
   STC.forEach(function(c){if(sc==='all'||sc===c[0]){var l=ITEMS.filter(function(x){return x.k===c[0]});if(l.length)h+=shelf(c[1],l)}});sbody.innerHTML=h}
@@ -158,6 +157,7 @@ var lt,lp=0;d.addEventListener('pointerdown',function(e){if(e.pointerType==='mou
 d.addEventListener('click',function(e){if(lp){lp=0;e.preventDefault();e.stopPropagation()}},true);
 d.addEventListener('click',function(e){var t=e.target,b;
   if(!t.closest('#ctx'))ctx.hidden=true;
+  if(b=t.closest('[data-why]')){e.preventDefault();openWhy();return}
   if(b=t.closest('[data-store]')){e.preventDefault();openStore();return}
   if(b=t.closest('[data-sc]')){sc=b.dataset.sc;drawStore();return}
   if(b=t.closest('.sc,.hero2')){openDet(b.dataset.id);return}
@@ -184,6 +184,25 @@ $('#q').addEventListener('keydown',function(e){if(sug.hidden)return;var n=sres.l
 sug.addEventListener('mousedown',function(e){e.preventDefault()});
 sug.addEventListener('click',function(e){var s=e.target.closest('.sg');if(s&&s.dataset.k)pick(+s.dataset.k)});
 d.addEventListener('click',function(e){if(!e.target.closest('.search'))sug.hidden=true});
+
+/* Why panel, iOS-style collapsing titles, shared live theme */
+var whyp=$('#whyp'),whyb=$('#whyBody');
+function openWhy(){whyp.hidden=false;root.style.overflow='hidden'}
+function closeWhy(){whyp.hidden=true;root.style.overflow=''}
+$('#whyClose').addEventListener('click',closeWhy);
+[sbody,whyb].forEach(function(el){var p=el.parentNode,q=0;el.addEventListener('scroll',function(){if(q)return;q=1;requestAnimationFrame(function(){q=0;var k=Math.min(1,el.scrollTop/56);p.style.setProperty('--k',k.toFixed(3));p.classList.toggle('sd',el.scrollTop>4)})},{passive:true})});
+var THEMES=[['crimson','Crimson','#e50914'],['midnight','Midnight','#3b82f6'],['emerald','Emerald','#10b981'],['violet','Violet','#8b5cf6'],['amber','Amber','#f59e0b'],['mono','Mono','#a1a1a6']],tm=$('#themeMenu'),tb=$('#themeBtn'),lastSet=0;
+if(!root.dataset.theme)root.dataset.theme='crimson';
+$('#sw').innerHTML=THEMES.map(function(t){return'<button data-th="'+t[0]+'" style="--sc:'+t[2]+'" aria-label="'+t[1]+'"><i></i>'+t[1]+'</button>'}).join('');
+function markTheme(){[].forEach.call($('#sw').children,function(b){b.classList.toggle('on',b.dataset.th===root.dataset.theme)})}
+function applyTheme(t){if(!THEMES.some(function(x){return x[0]===t}))return;root.dataset.theme=t;try{localStorage.setItem('mc:theme',t)}catch(e){}markTheme()}
+function setTheme(t){applyTheme(t);lastSet=Date.now();fetch('/api/theme',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({theme:t})}).then(function(r){toast(r.status===429?'Too many changes — try again in a minute':r.ok?'Theme changed for everyone':'Saved on this device only')}).catch(function(){toast('Offline — saved on this device only')})}
+function pullTheme(){if(Date.now()-lastSet<6000)return;fetch('/api/theme',{cache:'no-store'}).then(function(r){return r.ok?r.json():null}).then(function(s){if(s&&s.theme&&s.theme!==root.dataset.theme)applyTheme(s.theme)}).catch(function(){})}
+function openTheme(){tm.hidden=false;tb.setAttribute('aria-expanded','true');markTheme()}
+tb.addEventListener('click',function(e){e.stopPropagation();if(tm.hidden)openTheme();else{tm.hidden=true;tb.setAttribute('aria-expanded','false')}});
+$('#sw').addEventListener('click',function(e){var b=e.target.closest('button');if(b)setTheme(b.dataset.th)});
+d.addEventListener('click',function(e){if(!e.target.closest('#themeMenu,#themeBtn')){tm.hidden=true;tb.setAttribute('aria-expanded','false')}});
+markTheme();pullTheme();setInterval(pullTheme,10000);d.addEventListener('visibilitychange',function(){if(!d.hidden)pullTheme()});
 
 /* PWA, status, deep link, mood */
 var dp=null;addEventListener('beforeinstallprompt',function(e){e.preventDefault();dp=e;$('#inst').hidden=false});
