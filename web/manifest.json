@@ -1,0 +1,14 @@
+{
+  "name": "MahiCloud",
+  "short_name": "MahiCloud",
+  "description": "Apps, tools, movie directories and privacy services by Mahi.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#0a0a0a",
+  "icons": [
+    {"src": "/brand-m.webp", "sizes": "512x512", "type": "image/webp", "purpose": "any"},
+    {"src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any"}
+  ]
+}
