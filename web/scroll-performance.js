@@ -31,6 +31,8 @@
     "  -webkit-backdrop-filter: none !important;",
     "  backdrop-filter: none !important;",
     "}",
+    "html.mc-scroll-active .grad,",
+    "html.mc-scroll-active .mark img,",
     "html.mc-scroll-active .stage::before,",
     "html.mc-scroll-active .ambient::before,",
     "html.mc-scroll-active .glow-ball,",
