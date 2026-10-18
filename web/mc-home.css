@@ -291,3 +291,33 @@ html body #mahi-catalog-plus:active{transform:scale(.95)!important}
 .mc-add-kicker{color:var(--hi)!important}.mc-add-submit{background:linear-gradient(180deg,rgba(var(--ac),.95),rgba(var(--ad),.95))!important;border:0!important;color:#fff!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 10px 26px rgba(var(--ac),.3)}
 @media(max-width:700px){html body #mahi-catalog-plus{right:14px!important;bottom:calc(92px + env(safe-area-inset-bottom))!important;height:50px!important;min-height:50px!important;padding:0 20px 0 10px!important}.tm{top:68px;right:12px}}
 @media(prefers-reduced-motion:reduce){html body #mahi-catalog-plus{animation:none}.lt{scale:1;opacity:1}}
+
+
+/* Targeted usability consistency fixes */
+:root{--r:16px;--mc-radius-sm:8px;--mc-radius-md:14px;--mc-radius-lg:20px;--mc-radius-pill:999px}
+button,.pill,.tabs button,.chp,.ctx button{font-size:14px}
+.pill.sm{font-size:14px}.pill.lg{font-size:16px}
+.topnav{gap:20px;padding-left:18px;padding-right:14px}
+.links{gap:6px}.links a{padding:7px 11px}.links a.on{background:rgba(255,255,255,.045)}
+.hero{min-height:auto;gap:14px;padding:112px 20px 28px}
+.hero .eyebrow{order:0;text-transform:none;letter-spacing:.06em}
+.hero h1{order:1}
+.hero .sub{order:2}
+.hero .search{order:3;height:58px}
+.hero .cta{order:4}
+.hero .avatar{order:5;width:88px;height:88px;padding:3px;box-shadow:0 8px 28px rgba(var(--ac),.16);opacity:.78}
+.hero .soc{order:6;gap:10px;opacity:.68;transform:scale(.88)}
+.block{padding-top:36px;padding-bottom:36px}
+#activity>h2{max-width:1040px;margin-left:auto;margin-right:auto;text-align:left;padding-left:0}
+.bars.empty i{background:linear-gradient(rgba(255,255,255,.16),rgba(255,255,255,.07));box-shadow:none}
+.pin{opacity:.45;color:var(--muted)}.pin:hover,.pin:focus-visible,.pin[aria-pressed=true]{opacity:1}
+.ty{display:inline-flex;align-items:center}
+.status-badge{display:inline-flex;align-items:center;margin-left:6px;padding:2px 7px;border-radius:999px;font-size:10px;line-height:1.4;color:var(--muted);background:rgba(255,255,255,.07);white-space:nowrap}
+.status-badge.soon{box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}
+.search{height:58px}
+.foot nav{align-items:center;gap:18px}.foot nav .social-link{margin-left:10px;padding-left:18px;border-left:1px solid rgba(255,255,255,.12)}
+/* Quick add is secondary to the main call to action */
+html body #mahi-catalog-plus{background:rgba(20,20,20,.58)!important;color:var(--text)!important;border:1px solid rgba(255,255,255,.22)!important;box-shadow:0 8px 24px rgba(0,0,0,.22)!important;animation:none!important;backdrop-filter:blur(16px)!important;-webkit-backdrop-filter:blur(16px)!important}
+html body #mahi-catalog-plus .mc-catalog-plus-icon{background:rgba(255,255,255,.08)!important;box-shadow:none!important}
+html body #mahi-catalog-plus:hover{background:rgba(255,255,255,.09)!important;box-shadow:0 8px 24px rgba(0,0,0,.3)!important}
+@media(max-width:700px){.hero{padding-top:100px}.hero .avatar{width:72px;height:72px}.topnav{gap:8px}.links{gap:2px}.links a{padding:7px 8px;font-size:13px}}
