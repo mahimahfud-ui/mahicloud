@@ -281,6 +281,9 @@
     isEnabled: isEnabled
   });
 
+  // The runtime can be loaded by a same-origin assistant page without rendering the hub UI.
+  if (!document.getElementById("pluginSearch")) return;
+
   function el(tag, className, text) {
     var node = document.createElement(tag);
     if (className) node.className = className;
@@ -506,9 +509,8 @@
       var host = url.hostname.toLowerCase();
       if (url.protocol !== "https:" || !host || url.username || url.password) return false;
       if (host === "localhost" || host.endsWith(".localhost") || host.endsWith(".local") || host.endsWith(".internal")) return false;
-      if (/^(?:127\.|10\.|192\.168\.|169\.254\.|0\.)/.test(host)) return false;
-      var match = host.match(/^172\.(\d{1,3})\./);
-      if (match && Number(match[1]) >= 16 && Number(match[1]) <= 31) return false;
+      // Imported shortcut plugins are links, not network fetches; reject IP literals and local hosts outright.
+      if (/^(?:\d{1,3}\.){3}\d{1,3}$/.test(host) || host.indexOf(":") >= 0) return false;
       return true;
     } catch (_) { return false; }
   }
