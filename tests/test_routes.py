@@ -51,6 +51,29 @@ class MahiCloudRouteTests(unittest.TestCase):
                         f"Broken local link/asset {value!r} found on {path}",
                     )
 
+    def test_plugins_hub_route_and_tool_bridge_are_available(self):
+        response = self.client.get("/plugins", follow_redirects=False)
+        self.assertEqual(response.status_code, 308)
+        self.assertEqual(response.headers.get("Location"), "/plugins/")
+
+        page = self.client.get("/plugins/")
+        self.assertEqual(page.status_code, 200)
+        self.assertIn(b"Plugin Hub", page.data)
+        self.assertIn(b"/plugins/plugins.css", page.data)
+        self.assertIn(b"/plugins/plugins.js", page.data)
+        self.assertIn(b"Add plugin", page.data)
+
+        script = self.client.get("/plugins/plugins.js")
+        self.assertEqual(script.status_code, 200)
+        self.assertIn(b"MahiCloudPluginHost", script.data)
+        self.assertIn(b"listTools", script.data)
+        self.assertIn(b"runTool", script.data)
+        self.assertNotIn(b"eval(", script.data)
+
+        css = self.client.get("/plugins/plugins.css")
+        self.assertEqual(css.status_code, 200)
+        self.assertIn(b"prefers-reduced-motion", css.data)
+
     def test_custom_404_page_is_branded_and_returns_404(self):
         response = self.client.get("/this-page-should-not-exist")
         self.assertEqual(response.status_code, 404)
