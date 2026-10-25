@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Plugin Hub — MahiCloud</title>
+  <meta name="description" content="Discover, enable and manage trusted plugins for MahiCloud.">
+  <meta name="theme-color" content="#0a0a0a">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/mahicloud-theme.css">
+  <link rel="stylesheet" href="/site-polish.css">
+  <link rel="stylesheet" href="/plugins/plugins.css">
+  <script defer src="/site-polish.js"></script>
+  <script defer src="/plugins/plugins.js"></script>
+</head>
+<body class="plugin-page">
+  <header class="ph-nav">
+    <a class="ph-brand" href="/" aria-label="MahiCloud home">
+      <img src="/brand-m.webp" alt="" width="30" height="30">
+      <span>MahiCloud</span>
+    </a>
+    <nav class="ph-links" aria-label="Primary navigation">
+      <a href="/">Home</a>
+      <a href="/#library">Library</a>
+      <a href="/plugins/" aria-current="page">Plugins</a>
+      <a href="/privacy">Privacy</a>
+    </nav>
+    <a class="ph-back" href="/#library"><span aria-hidden="true">←</span> Library</a>
+  </header>
+
+  <main class="ph-main">
+    <section class="ph-hero">
+      <div class="ph-eyebrow"><span class="ph-live-dot"></span> MAHICLOUD · PLUGIN HUB</div>
+      <h1>Make your workflow <span>more capable.</span></h1>
+      <p>Choose the tools you trust. Enable a plugin only when you need it, review its permissions, and keep control over what runs.</p>
+      <div class="ph-hero-meta">
+        <span><b id="availableCount">5</b> built-in plugins</span>
+        <span><i></i> Local-first settings</span>
+        <span><i></i> No API key needed for built-ins</span>
+      </div>
+    </section>
+
+    <section class="ph-toolbar" aria-label="Find plugins">
+      <label class="ph-search">
+        <span aria-hidden="true">⌕</span>
+        <input id="pluginSearch" type="search" placeholder="Search plugins and capabilities…" autocomplete="off" aria-label="Search plugins">
+        <kbd>/</kbd>
+      </label>
+      <button class="ph-button ph-button-primary" id="importOpen" type="button"><span aria-hidden="true">＋</span> Add plugin</button>
+    </section>
+
+    <div class="ph-filters" role="group" aria-label="Filter plugins">
+      <button type="button" class="ph-filter is-active" data-filter="all" aria-pressed="true">All plugins</button>
+      <button type="button" class="ph-filter" data-filter="Research" aria-pressed="false">Research</button>
+      <button type="button" class="ph-filter" data-filter="Productivity" aria-pressed="false">Productivity</button>
+      <button type="button" class="ph-filter" data-filter="Utilities" aria-pressed="false">Utilities</button>
+      <button type="button" class="ph-filter" data-filter="enabled" aria-pressed="false">Enabled <span id="enabledFilterCount">0</span></button>
+    </div>
+
+    <section class="ph-section">
+      <div class="ph-section-head">
+        <div><p class="ph-overline">DISCOVER</p><h2>Available plugins</h2><p class="ph-muted">Small tools with clear, limited permissions.</p></div>
+        <span class="ph-result-count" id="resultCount">5 plugins</span>
+      </div>
+      <div class="ph-grid" id="pluginGrid" aria-live="polite"></div>
+      <div class="ph-empty" id="emptyState" hidden><span>⌕</span><b>No plugins found</b><p>Try another search or filter.</p></div>
+    </section>
+
+    <section class="ph-enabled-section">
+      <div class="ph-section-head">
+        <div><p class="ph-overline">YOUR SETUP</p><h2>Enabled plugins</h2><p class="ph-muted">Only enabled tools are exposed to the MahiCloud plugin bridge.</p></div>
+        <div class="ph-small-actions">
+          <button class="ph-button ph-button-quiet" id="copyTools" type="button">Copy enabled tool list</button>
+          <button class="ph-button ph-button-quiet" id="exportSetup" type="button">Export setup</button>
+        </div>
+      </div>
+      <div class="ph-enabled-list" id="enabledList"></div>
+      <p class="ph-footnote"><span aria-hidden="true">ⓘ</span> Plugin preferences are saved in this browser. Built-in utilities process their input locally. Search and imported-link plugins can open external websites.</p>
+    </section>
+
+    <section class="ph-dev-card" aria-labelledby="bridgeTitle">
+      <div class="ph-dev-icon" aria-hidden="true">⌘</div>
+      <div class="ph-dev-copy">
+        <p class="ph-overline">EXTENSION INTERFACE</p>
+        <h2 id="bridgeTitle">A consistent tool bridge</h2>
+        <p>Enabled built-ins publish tool names, descriptions and input schemas through <code>window.MahiCloudPluginHost</code>. An AI chat interface on this origin can discover the available tools and call them through the same permission-checked runtime.</p>
+      </div>
+      <button class="ph-button ph-button-outline" id="copyBridge" type="button">Copy bridge example</button>
+    </section>
+  </main>
+
+  <footer class="ph-footer"><span>© MahiCloud</span><span>Only enable plugins you trust.</span><a href="/privacy">Privacy</a></footer>
+
+  <div class="ph-modal-backdrop" id="permissionDialog" hidden>
+    <section class="ph-modal" role="dialog" aria-modal="true" aria-labelledby="permissionTitle" aria-describedby="permissionDescription">
+      <button class="ph-modal-close" type="button" data-close="permissionDialog" aria-label="Close">×</button>
+      <p class="ph-overline">PERMISSIONS</p>
+      <h2 id="permissionTitle">Enable plugin?</h2>
+      <p id="permissionDescription" class="ph-muted">Review the access this plugin requests before enabling it.</p>
+      <div id="permissionList" class="ph-permissions"></div>
+      <div class="ph-modal-actions"><button class="ph-button ph-button-quiet" type="button" data-close="permissionDialog">Cancel</button><button class="ph-button ph-button-primary" id="permissionConfirm" type="button">Allow and enable</button></div>
+    </section>
+  </div>
+
+  <div class="ph-modal-backdrop" id="runnerDialog" hidden>
+    <section class="ph-modal ph-runner-modal" role="dialog" aria-modal="true" aria-labelledby="runnerTitle">
+      <button class="ph-modal-close" type="button" data-close="runnerDialog" aria-label="Close">×</button>
+      <p class="ph-overline" id="runnerCategory">PLUGIN TOOL</p>
+      <h2 id="runnerTitle">Run plugin</h2>
+      <p id="runnerDescription" class="ph-muted"></p>
+      <form id="runnerForm" class="ph-runner-form"></form>
+      <div class="ph-output-wrap" id="runnerOutputWrap" hidden>
+        <div class="ph-output-head"><b>Result</b><button class="ph-button ph-button-quiet" id="copyResult" type="button">Copy</button></div>
+        <pre id="runnerOutput" class="ph-output"></pre>
+        <a id="runnerLink" class="ph-result-link" href="#" target="_blank" rel="noopener noreferrer" hidden>Open result ↗</a>
+      </div>
+    </section>
+  </div>
+
+  <div class="ph-modal-backdrop" id="importDialog" hidden>
+    <section class="ph-modal" role="dialog" aria-modal="true" aria-labelledby="importTitle">
+      <button class="ph-modal-close" type="button" data-close="importDialog" aria-label="Close">×</button>
+      <p class="ph-overline">CUSTOM PLUGIN</p>
+      <h2 id="importTitle">Add a trusted shortcut</h2>
+      <p class="ph-muted">Import a JSON manifest for an HTTPS service shortcut. For safety, imported plugins can only open the URL you specify; they cannot run scripts or request secrets.</p>
+      <form id="importForm" class="ph-runner-form">
+        <label class="ph-field"><span>Plugin manifest JSON</span><textarea id="manifestInput" rows="8" spellcheck="false" placeholder='{"id":"my-service","name":"My Service","description":"Open my service","url":"https://example.com","category":"Productivity","version":"1.0.0"}' required></textarea></label>
+        <p class="ph-inline-note">Use a unique ID, a short description and an HTTPS URL. Custom shortcuts are stored only in this browser.</p>
+        <div class="ph-modal-actions"><button class="ph-button ph-button-quiet" type="button" data-close="importDialog">Cancel</button><button class="ph-button ph-button-primary" type="submit">Validate and add</button></div>
+      </form>
+    </section>
+  </div>
+
+  <div id="phToast" class="ph-toast" role="status" aria-live="polite"></div>
+</body>
+</html>
