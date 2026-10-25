@@ -341,6 +341,16 @@ def apps_index():
     return send_from_directory(os.path.join(app.root_path, "web", "apps"), "index.html")
 
 
+@app.get("/plugins")
+def plugins_redirect():
+    return redirect("/plugins/", code=308)
+
+
+@app.get("/plugins/")
+def plugins_index():
+    return send_from_directory(os.path.join(app.root_path, "web", "plugins"), "index.html")
+
+
 
 # The former chat interface is hidden; catalog additions use the floating plus dialog.
 @app.route("/mahi-ai", defaults={"legacy_path": ""})
