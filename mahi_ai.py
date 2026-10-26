@@ -94,7 +94,7 @@ def _require_access() -> None:
 def _require_ai() -> str:
     key = _openai_key()
     if not key:
-        raise MahiAIError("OPENAI_API_KEY is not configured on the Flask hosting service.", 503)
+        raise MahiAIError("MahiCloud AI is not configured on the hosting service yet. Please contact the administrator.", 503)
     return key
 
 
