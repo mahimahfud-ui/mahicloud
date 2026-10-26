@@ -40,6 +40,14 @@ class MahiAIIdentityTests(unittest.TestCase):
         self.assertIn("Internal model-routing details", reply)
         self.assertNotRegex(reply, r"(?i)\b(openai|groq|gpt)\b")
 
+    def test_bangla_provider_source_question_gets_brand_neutral_reply(self):
+        reply = _provider_identity_reply(
+            "আমার উত্তর কি OpenAI থেকে আসছে?",
+            "Your answers come from OpenAI.",
+        )
+        self.assertIn("MahiCloud AI", reply)
+        self.assertNotRegex(reply, r"(?i)\\b(openai|groq|gpt)\\b")
+
     def test_provider_attribution_is_not_returned_as_the_assistant_identity(self):
         reply = _provider_identity_reply(
             "Who are you?",
