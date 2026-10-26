@@ -46,7 +46,7 @@ class MahiAIIdentityTests(unittest.TestCase):
             "Your answers come from OpenAI.",
         )
         self.assertIn("MahiCloud AI", reply)
-        self.assertNotRegex(reply, r"(?i)\\b(openai|groq|gpt)\\b")
+        self.assertNotRegex(reply, r"(?i)\b(openai|groq|gpt)\b")
 
     def test_provider_attribution_is_not_returned_as_the_assistant_identity(self):
         reply = _provider_identity_reply(
