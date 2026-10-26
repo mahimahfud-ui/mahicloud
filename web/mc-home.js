@@ -4,6 +4,29 @@ var RM=matchMedia('(prefers-reduced-motion:reduce)').matches;
 function ld(k,df){try{return JSON.parse(localStorage.getItem(k))||df}catch(e){return df}}
 function sv(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
 
+/* Keep the project viewer matched to the actually visible viewport, including
+   mobile browser chrome, rotation and the virtual keyboard where supported. */
+var viewportSyncQueued=false;
+function syncVisibleViewport(){
+  var vv=window.visualViewport;
+  var height=vv&&vv.height>0?vv.height:window.innerHeight;
+  var top=vv&&typeof vv.offsetTop==='number'&&isFinite(vv.offsetTop)?vv.offsetTop:0;
+  root.style.setProperty('--mc-viewport-height',Math.max(1,Math.round(height))+'px');
+  root.style.setProperty('--mc-viewport-top',Math.max(0,Math.round(top))+'px');
+}
+function scheduleViewportSync(){
+  if(viewportSyncQueued)return;
+  viewportSyncQueued=true;
+  requestAnimationFrame(function(){viewportSyncQueued=false;syncVisibleViewport()});
+}
+syncVisibleViewport();
+window.addEventListener('resize',scheduleViewportSync,{passive:true});
+window.addEventListener('orientationchange',scheduleViewportSync,{passive:true});
+if(window.visualViewport){
+  window.visualViewport.addEventListener('resize',scheduleViewportSync,{passive:true});
+  window.visualViewport.addEventListener('scroll',scheduleViewportSync,{passive:true});
+}
+
 /* Library data — add new projects here */
 var ITEMS=[{id:'apps',n:'Apps',t:'Collection',k:'apps',h:'/apps/',s:'Phone & desktop apps',b:'live',p:['Android','Windows','Web'],d:'A growing collection of apps built by Mahi for phone and desktop.',g:'<rect x="4" y="4" width="6" height="6" rx="1.5"/><rect x="14" y="4" width="6" height="6" rx="1.5"/><rect x="4" y="14" width="6" height="6" rx="1.5"/><rect x="14" y="14" width="6" height="6" rx="1.5"/>',c:['#3b82f6','#1e40af']},
 {id:'flix',n:'MahiFlix',t:'Movies',k:'movies',h:'/mahiflix/',s:'Movie & web series directory',b:'live',p:['Web'],d:'A directory of movie and web-series apps and websites in one place.',g:'<rect x="3" y="5" width="18" height="14" rx="3"/><path d="M10 9l5 3-5 3z"/>',c:['#e50914','#7a0309']},
@@ -54,7 +77,7 @@ function openSheet(h,id,title,el){last=el||null;cur=id?location.origin+'/?open='
   if(id){log(id);rec=[id].concat(rec.filter(function(x){return x!==id})).slice(0,6);sv('mc:rec',rec)}
   $('#sheetTitle').textContent=title||'MahiCloud';$('#sheetPath').textContent=h;$('#sheetOpen').href=h;
   load.classList.remove('off');frame.src=h+(h.indexOf('?')>-1?'&':'?')+'mc-embed=1';
-  sheet.hidden=false;root.style.overflow='hidden';$('#sheetClose').focus()}
+  sheet.hidden=false;root.style.overflow='hidden';scheduleViewportSync();$('#sheetClose').focus()}
 frame.addEventListener('load',function(){if(frame.getAttribute('src')!=='about:blank')load.classList.add('off')});
 function closeSheet(){sheet.hidden=true;frame.src='about:blank';root.style.overflow='';if(last&&last.focus)last.focus();if(st.cat==='recent')render()}
 d.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('a[data-sheet]');if(!a||e.button||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();openSheet(a.getAttribute('href'),a.dataset.id,a.dataset.title,a)});
