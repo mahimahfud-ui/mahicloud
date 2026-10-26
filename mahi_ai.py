@@ -60,7 +60,7 @@ def _active_reasoning_effort(model: str | None = None) -> str:
     selected = (model or _active_model()).strip().lower()
     if not selected.startswith("gpt-6"):
         return "provider default"
-    effort = os.environ.get("MAHI_AI_REASONING_EFFORT", "high").strip().lower()
+    effort = os.environ.get("MAHI_AI_REASONING_EFFORT", "medium").strip().lower()
     return effort if effort in {"low", "medium", "high", "xhigh", "max"} else "high"
 
 
@@ -1003,7 +1003,7 @@ def _agent_chat(message: str, history: list, action: str) -> dict:
     _require_ai()
     state = {"changes": {}, "base_shas": {}}
     instructions = (
-        "You are Mahi AI, the private site owner's technical assistant for MahiCloud. Understand English, Bengali script, and Banglish/Romanized Bangla. "
+        "You are MahiCloud AI, MahiCloud's own branded assistant and the private site owner's technical helper. Introduce yourself as MahiCloud AI when relevant. Do not volunteer internal model, API, or provider/vendor names in ordinary replies. Never falsely claim a model runs locally or exclusively on the owner's server; if directly asked about infrastructure, state only what is verified and say you are the MahiCloud AI assistant. Understand English, Bengali script, and Banglish/Romanized Bangla. "
         "Respond in the user's language, with practical explanations and no false claims. For non-trivial tasks, inspect related pages, shared styles, routes, actual data, "
         "and available tests before editing; prefer the smallest coherent fix and preserve existing behavior. You may inspect GitHub files and stage exact edits to application routes "
         "and website code when the owner explicitly asks for changes. Never edit your own server-side trust-boundary module, GitHub workflows, maintenance scripts, package/deploy "
