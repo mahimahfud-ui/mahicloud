@@ -336,3 +336,50 @@ html body #mahi-catalog-plus:hover{background:rgba(255,255,255,.09)!important;bo
 :where(.nm,.ty,.perk p,.cmd-i small,.sg small,.sc small){font-size:12px}
 :where(.path,.perk p,.det dd,.sub){font-size:14px}
 :where(h1){font-size:clamp(34px,6.4vw,64px)}
+
+/* Device-adaptive full-screen project viewer.
+   The visible viewport height is synced by mc-home.js on resize, rotation and
+   mobile browser chrome/keyboard changes. Keep the frame shrinkable in flex. */
+#sheet {
+  inset: var(--mc-viewport-top, 0px) 0 auto 0;
+  width: 100%;
+  height: var(--mc-viewport-height, 100vh);
+  max-height: var(--mc-viewport-height, 100vh);
+  min-height: 0;
+  overflow: hidden;
+  overscroll-behavior: none;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+#sheet .sheet-bar {
+  flex: 0 0 auto;
+  width: 100%;
+  padding-left: max(12px, env(safe-area-inset-left, 0px));
+  padding-right: max(12px, env(safe-area-inset-right, 0px));
+}
+#sheet iframe {
+  display: block;
+  flex: 1 1 auto;
+  width: 100%;
+  height: 0;
+  min-width: 0;
+  min-height: 0;
+  align-self: stretch;
+}
+#sheet .sheet-load {
+  top: calc(64px + env(safe-area-inset-top, 0px));
+  right: 0;
+  bottom: env(safe-area-inset-bottom, 0px);
+  left: 0;
+}
+@supports (height: 100dvh) {
+  #sheet {
+    height: var(--mc-viewport-height, 100dvh);
+    max-height: var(--mc-viewport-height, 100dvh);
+  }
+}
+@media (max-width: 700px) {
+  #sheet .sheet-bar { gap: 7px; }
+  #sheet .sheet-bar .circle { flex: 0 0 40px; width: 40px; height: 40px; }
+  #sheet .tt { flex: 1 1 auto; min-width: 0; max-width: none; }
+  #sheet .tt small { max-width: 32vw; }
+}
