@@ -13,7 +13,9 @@ class FullscreenViewerTests(unittest.TestCase):
     def get_text(self, path):
         response = self.client.get(path)
         self.assertEqual(response.status_code, 200, path)
-        return response.get_data(as_text=True)
+        body = response.get_data(as_text=True)
+        response.close()
+        return body
 
     def test_homepage_keeps_viewport_fitting_and_fullscreen_frame_support(self):
         html = self.get_text("/")
