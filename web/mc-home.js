@@ -37,8 +37,7 @@ var ITEMS=[{id:'apps',n:'Apps',t:'Collection',k:'apps',h:'/apps/',s:'Phone & des
 {id:'unf',n:'Unfollowers',t:'Social',k:'social',h:'/unfollowers/',s:'See who unfollowed you',b:'live',p:['Web'],d:'Check who stopped following you.',g:'<circle cx="10" cy="8" r="3.5"/><path d="M3 20c0-4 3-6 7-6s7 2 7 6M17 9l4 4M21 9l-4 4"/>',c:['#fb923c','#c2410c']},
 {id:'bh',n:'Browser Helper',t:'Guide',k:'privacy',h:'/browser-helper-guide.html',s:'Setup guide for helper tools',b:'live',p:['Web'],d:'Step-by-step guide for setting up the browser helper tools.',g:'<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/>',c:['#22c55e','#166534']},
 {id:'pp',n:'Privacy Policy',t:'Privacy',k:'privacy',h:'/privacy',s:'How MahiCloud treats your data',b:'live',p:['Web'],d:'How MahiCloud handles your data and privacy.',g:'<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/>',c:['#14b8a6','#115e59']},
-{id:'dns',n:'DNS & Network',t:'Privacy',k:'privacy',s:'Private DNS & network services',b:'soon',p:['Web'],d:'Private DNS and network services are on the way.',g:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/>',c:['#6366f1','#3730a3']},
-{id:'next',n:'Next project',t:'Future',k:'apps',s:'Something new is in the works',b:'soon',p:['Web'],d:'A new project is being built.',g:'<path d="M12 5v14M5 12h14"/>',c:['#64748b','#334155']}];
+];
 var CATS=[['all','All'],['pinned','Pinned ☆'],['recent','Recent'],['apps','Apps'],['movies','Movies'],['tools','Tools'],['social','Social'],['privacy','Privacy']];
 var st={cat:'all',q:'',view:ld('mc:view','grid')},pins=ld('mc:pins',[]),rec=ld('mc:rec',[]);
 var tabs=$('.tabs'),files=$('#files');
@@ -53,7 +52,7 @@ function render(){
   files.className='files'+(st.view==='list'?' list':'');files.setAttribute('aria-busy','false');
   files.innerHTML=list.length?list.map(function(x,k){
     var p=pins.indexOf(x.id)>-1,s=x.b||'live',
-        category={apps:'Apps',movies:'Movies',tools:'Tools',social:'Social',privacy:'Privacy'}[x.k]||x.t,
+        category={apps:'Collection',movies:'Movies',tools:'Tools',social:'Social',privacy:'Privacy'}[x.k]||x.t,
         inn='<span class="ic" style="--c1:'+x.c[0]+';--c2:'+x.c[1]+'" aria-hidden="true">'+ico(x)+'</span><span class="tx"><span class="nm">'+x.n+'</span><span class="ds">'+x.s+'</span></span><span class="ty">'+category+'</span>'+(x.b==='soon'?'<span class="status-badge soon">Coming soon</span>':x.b==='beta'?'<span class="status-badge">Beta</span>':'');
     return'<div class="file'+(s==='soon'?' soon':'')+'" role="listitem" style="animation-delay:'+k*45+'ms">'+
     (x.h?'<a class="fl" href="'+x.h+'" data-sheet data-id="'+x.id+'" data-title="'+x.n+'">'+inn+'</a><button class="pin" data-pin="'+x.id+'" aria-pressed="'+p+'" aria-label="'+(p?'Unpin ':'Pin ')+x.n+'">'+(p?'★':'☆')+'</button>':'<div class="fl" aria-disabled="true">'+inn+'</div>')+'</div>'}).join('')
@@ -124,7 +123,7 @@ d.addEventListener('pointerdown',function(e){var t=e.target.closest&&e.target.cl
 
 /* Command palette */
 var cmd=$('#cmd'),cq=$('#cmdq'),cl=$('#cmdl'),ci=0,cr=[],cprev=null;
-function acts(){var A=[['home','Home','⌂'],['library','Library','▦'],['why','Why MahiCloud','★'],['privacy','DNS, Network & Privacy','⛨']].map(function(s){return{n:s[1],t:'Go to',i:s[2],f:function(){go(s[0])}}});
+function acts(){var A=[['home','Home','⌂'],['library','Library','▦'],['why','Why MahiCloud','★'],['privacy','Privacy & Tool Requests','⛨']].map(function(s){return{n:s[1],t:'Go to',i:s[2],f:function(){go(s[0])}}});
   A.push({n:st.view==='grid'?'Switch to list view':'Switch to grid view',t:'Action',i:'☰',f:function(){st.view=st.view==='grid'?'list':'grid';sv('mc:view',st.view);render()}},
    {n:'Show pinned projects',t:'Action',i:'☆',f:function(){st.cat='pinned';render();go('library')}},
    {n:'Show recently opened',t:'Action',i:'◷',f:function(){st.cat='recent';render();go('library')}},
