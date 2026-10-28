@@ -37,7 +37,7 @@ class MahiCloudRouteTests(unittest.TestCase):
         self.assertIn(b'./app.js', workspace.data)
         self.assertNotIn(b'<iframe', workspace.data.lower())
         self.assertEqual(self.client.get("/quick-add.js").status_code, 404)
-        self.assertEqual(self.client.post("/api/catalog-add/verify", json={}).status_code, 404)
+        self.assertEqual(self.client.post("/api/catalog-add/verify", json={}).status_code, 405)
 
     def test_current_pages_preserve_mobile_accessibility_and_reduced_motion(self):
         pages = {
