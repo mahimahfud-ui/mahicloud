@@ -217,6 +217,8 @@ function providerStatus(): Array<Record<string, unknown>> {
     { id: "groq", label: "Groq", kind: "AI provider", keys: ["GROQ_API_KEY"] },
     { id: "openrouter", label: "OpenRouter", kind: "AI provider", keys: ["OPENROUTER_API_KEY"] },
     { id: "deepseek", label: "DeepSeek", kind: "AI provider", keys: ["DEEPSEEK_API_KEY", "DeepSeek"] },
+    { id: "nvidia", label: "NVIDIA", kind: "AI provider", keys: ["NVIDIA_API_KEY"] },
+    { id: "mistral", label: "Mistral", kind: "AI provider", keys: ["MISTRAL_API_KEY"] },
     { id: "anthropic", label: "Anthropic", kind: "AI provider", keys: ["ANTHROPIC_API_KEY"] },
     { id: "venice", label: "Venice", kind: "AI provider", keys: ["VENICE_API_KEY", "VENICEAI_API_KEY", "VENICE", "Venice AI"] },
     { id: "cloudflare", label: "Cloudflare AI", kind: "AI provider", keys: ["CLOUDFLARE_API_TOKEN", "CLOUDFLARE_API_KEY", "Cloudflare"] },
