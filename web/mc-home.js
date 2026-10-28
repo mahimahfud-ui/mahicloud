@@ -256,5 +256,5 @@ $$('.soc a').forEach(function(a){a.addEventListener('click',function(){toast(a.c
 
 /* Skeleton first paint */
 files.setAttribute('aria-busy','true');files.innerHTML=new Array(9).join('<i class="sk"></i>');
-setTimeout(render,RM?0:550);
+requestAnimationFrame(render);
 })();
