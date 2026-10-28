@@ -64,9 +64,9 @@ function render(){
   files.innerHTML=list.length?list.map(function(x,k){
     var p=pins.indexOf(x.id)>-1,s=x.b||'live',
         category={apps:'Collection',movies:'Movies',websites:'Websites',music:'Music',tools:'Tools',social:'Social',privacy:'Privacy'}[x.k]||x.t,
-        inn='<span class="ic" style="--c1:'+x.c[0]+';--c2:'+x.c[1]+'" aria-hidden="true">'+ico(x)+'</span><span class="tx"><span class="nm">'+x.n+'</span><span class="ds">'+x.s+'</span></span><span class="ty">'+category+'</span>'+(x.b==='soon'?'<span class="status-badge soon">Coming soon</span>':x.b==='beta'?'<span class="status-badge">Beta</span>':'');
+        inn='<span class="ic" style="--c1:'+esc(x.c[0])+';--c2:'+esc(x.c[1])+'" aria-hidden="true">'+ico(x)+'</span><span class="tx"><span class="nm">'+esc(x.n)+'</span><span class="ds">'+esc(x.s)+'</span></span><span class="ty">'+esc(category)+'</span>'+(x.b==='soon'?'<span class="status-badge soon">Coming soon</span>':x.b==='beta'?'<span class="status-badge">Beta</span>':'');
     return'<div class="file'+(s==='soon'?' soon':'')+'" role="listitem" style="animation-delay:'+k*45+'ms">'+
-    (x.h?'<a class="fl" href="'+x.h+'" data-sheet data-id="'+x.id+'" data-title="'+x.n+'">'+inn+'</a><button class="pin" data-pin="'+x.id+'" aria-pressed="'+p+'" aria-label="'+(p?'Unpin ':'Pin ')+x.n+'">'+(p?'★':'☆')+'</button>':'<div class="fl" aria-disabled="true">'+inn+'</div>')+'</div>'}).join('')
+    (x.h?'<a class="fl" href="'+esc(x.h)+'" data-sheet data-id="'+esc(x.id)+'" data-title="'+esc(x.n)+'">'+inn+'</a><button class="pin" data-pin="'+esc(x.id)+'" aria-pressed="'+p+'" aria-label="'+(p?'Unpin ':'Pin ')+esc(x.n)+'">'+(p?'★':'☆')+'</button>':'<div class="fl" aria-disabled="true">'+inn+'</div>')+'</div>'}).join('')
    :'<div class="empty"><b>'+(st.cat==='pinned'?'☆':st.cat==='recent'?'◷':'⌕')+'</b>'+(st.cat==='pinned'?'Nothing pinned yet — tap ☆ on any project.':st.cat==='recent'?'Projects you open will show up here.':'No matches. Try another word.')+'</div>';
   $('#count').textContent=list.length+' item'+(list.length===1?'':'s')+' · '+pins.length+' pinned';
   $('#pathCat').textContent=(CATS.filter(function(c){return c[0]===st.cat})[0]||[0,'Library'])[1].replace(' ☆','');
@@ -143,7 +143,7 @@ function acts(){var A=[['home','Home','⌂'],['library','Library','▦'],['why',
    {n:'Copy site link',t:'Action',i:'⎘',f:function(){if(navigator.clipboard)navigator.clipboard.writeText(location.origin).then(function(){toast('Link copied')})}});
   ITEMS.forEach(function(x){var b={live:'Live',beta:'Beta',soon:'Soon'}[x.b||'live'];A.push(x.h?{n:x.n,t:b,i:ico(x),s:x.s,f:function(){openSheet(x.h,x.id,x.n)}}:{n:x.n,t:'Coming soon',i:ico(x),s:x.s,f:function(){toast(x.n+' is coming soon')}})});return A}
 function cdraw(){var q=cq.value.toLowerCase().trim();cr=acts().filter(function(a){return!q||(a.n+' '+(a.s||'')+' '+a.t).toLowerCase().indexOf(q)>-1});ci=Math.min(ci,Math.max(0,cr.length-1));
-  cl.innerHTML=cr.length?cr.map(function(a,k){return'<li class="cmd-i'+(k===ci?' on':'')+'" role="option" data-k="'+k+'"><b>'+a.i+'</b><span>'+a.n+(a.s?'<small>'+a.s+'</small>':'')+'</span><em>'+a.t+'</em></li>'}).join(''):'<li class="cmd-e">No results</li>';
+  cl.innerHTML=cr.length?cr.map(function(a,k){return'<li class="cmd-i'+(k===ci?' on':'')+'" role="option" data-k="'+k+'"><b>'+a.i+'</b><span>'+esc(a.n)+(a.s?'<small>'+esc(a.s)+'</small>':'')+'</span><em>'+esc(a.t)+'</em></li>'}).join(''):'<li class="cmd-e">No results</li>';
   var o=cl.querySelector('.on');if(o)o.scrollIntoView({block:'nearest'})}
 function openCmd(){cprev=d.activeElement;cmd.hidden=false;root.style.overflow='hidden';cq.value='';ci=0;cdraw();cq.focus()}
 function closeCmd(){cmd.hidden=true;if(sheet.hidden)root.style.overflow='';if(cprev&&cprev.focus)cprev.focus()}
@@ -169,19 +169,19 @@ function health(){var live=ITEMS.filter(function(x){return x.h}),n=0;
     $$('.hd[data-id="'+x.id+'"]').forEach(function(e){e.className='hd '+x.hs;e.title=HL[x.hs]});
     if(++n===live.length){var bad=live.filter(function(y){return y.hs!=='up'}).length;$('#hsum').innerHTML='<span class="hs'+(bad?' warn':'')+'"></span>'+(bad?bad+' of '+n+' need attention':'All systems operational')}})})}
 var STC=[['apps','Apps'],['movies','Movies & Series'],['websites','Websites'],['music','Music'],['tools','Tools'],['social','Social'],['privacy','Privacy & Network']],sc='all',store=$('#store'),sbody=$('#storeBody'),det=$('#det'),ctx=$('#ctx'),cid='';
-function scard(x){return'<button class="sc" data-id="'+x.id+'">'+ic(x)+'<b>'+x.n+'</b><small>'+(x.b==='soon'?'Coming soon':x.t)+'</small></button>'}
-function shelf(t,l){return'<section class="shelf"><h3>'+t+'</h3><div class="row">'+l.map(scard).join('')+'</div></section>'}
-function drawStore(){var f=byId('flix'),h='<div class="lt">Store</div><div class="chips2">'+[['all','All']].concat(STC).map(function(c){return'<button class="chp'+(sc===c[0]?' on':'')+'" data-sc="'+c[0]+'">'+c[1]+'</button>'}).join('')+'</div>';
-  if(sc==='all'){h+='<button class="hero2" data-id="'+f.id+'" style="--c1:'+f.c[0]+';--c2:'+f.c[1]+'"><span><small>Featured</small><b>'+f.n+'</b><em>'+f.s+'</em></span>'+ic(f)+'</button>';
+function scard(x){return'<button class="sc" data-id="'+esc(x.id)+'">'+ic(x)+'<b>'+esc(x.n)+'</b><small>'+(x.b==='soon'?'Coming soon':esc(x.t))+'</small></button>'}
+function shelf(t,l){return'<section class="shelf"><h3>'+esc(t)+'</h3><div class="row">'+l.map(scard).join('')+'</div></section>'}
+function drawStore(){var f=byId('flix');if(!f)f=ITEMS[0];if(!f)return;var h='<div class="lt">Store</div><div class="chips2">'+[['all','All']].concat(STC).map(function(c){return'<button class="chp'+(sc===c[0]?' on':'')+'" data-sc="'+esc(c[0])+'">'+esc(c[1])+'</button>'}).join('')+'</div>';
+  if(sc==='all'){h+='<button class="hero2" data-id="'+esc(f.id)+'" style="--c1:'+esc(f.c[0])+';--c2:'+esc(f.c[1])+'"><span><small>Featured</small><b>'+esc(f.n)+'</b><em>'+esc(f.s)+'</em></span>'+ic(f)+'</button>';
     var r=rec[0]&&byId(rec[0]);if(r){var rel=ITEMS.filter(function(x){return x.k===r.k&&x.id!==r.id});if(rel.length)h+=shelf('Because you opened '+r.n,rel)}}
   STC.forEach(function(c){if(sc==='all'||sc===c[0]){var l=ITEMS.filter(function(x){return x.k===c[0]});if(l.length)h+=shelf(c[1],l)}});sbody.innerHTML=h}
 function openStore(){drawStore();store.hidden=false;root.style.overflow='hidden'}
 function closeStore(){store.hidden=true;root.style.overflow=''}
 function openDet(id){var x=byId(id);if(!x)return;var s=x.b||'live',L=x.l||[];
-  det.innerHTML='<div class="det-box glass"><button class="glass circle dx" data-x aria-label="Close">✕</button><div class="dh">'+ic(x)+'<div><h3>'+x.n+'</h3><p>'+x.t+' · <span class="bd2 '+s+'">'+LB2[s]+'</span>'+(x.nb?' <span class="bd2 nw">'+(x.nb==='new'?'NEW':'UPDATED')+'</span>':'')+'</p></div></div>'+
-  (x.h?'<div class="dact"><button class="glass pill red" data-go="'+id+'">Open Project</button><button class="glass pill" data-pin2="'+id+'">'+(pins.indexOf(id)>-1?'★ Pinned':'☆ Pin')+'</button><button class="glass pill" data-sh="'+id+'">Share</button></div>':'<p class="muted">Coming soon — not available yet.</p>')+
-  '<p class="dd">'+x.d+'</p><dl><div><dt>Platforms</dt><dd>'+x.p.join(' · ')+'</dd></div><div><dt>Status</dt><dd>'+(x.h?hd(x)+' '+(HL[x.hs]||'Checking…'):'—')+'</dd></div><div><dt>Version</dt><dd>'+(x.v||'—')+'</dd></div><div><dt>Requirements</dt><dd>'+(x.r||'A modern browser')+'</dd></div><div><dt>Privacy</dt><dd><a href="/privacy" data-sheet data-title="Privacy Policy">Read the policy</a></dd></div></dl><h4>What’s new</h4>'+
-  (L.length?'<ul class="cl">'+L.map(function(e){return'<li><b>'+e[0]+'</b> '+e[1]+'</li>'}).join('')+'</ul>':'<p class="muted">No updates posted yet.</p>')+'</div>';det.hidden=false}
+  det.innerHTML='<div class="det-box glass"><button class="glass circle dx" data-x aria-label="Close">✕</button><div class="dh">'+ic(x)+'<div><h3>'+esc(x.n)+'</h3><p>'+esc(x.t)+' · <span class="bd2 '+esc(s)+'">'+esc(LB2[s]||'Live')+'</span>'+(x.nb?' <span class="bd2 nw">'+(x.nb==='new'?'NEW':'UPDATED')+'</span>':'')+'</p></div></div>'+
+  (x.h?'<div class="dact"><button class="glass pill red" data-go="'+esc(id)+'">Open Project</button><button class="glass pill" data-pin2="'+esc(id)+'">'+(pins.indexOf(id)>-1?'★ Pinned':'☆ Pin')+'</button><button class="glass pill" data-sh="'+esc(id)+'">Share</button></div>':'<p class="muted">Coming soon — not available yet.</p>')+
+  '<p class="dd">'+esc(x.d)+'</p><dl><div><dt>Platforms</dt><dd>'+x.p.map(esc).join(' · ')+'</dd></div><div><dt>Status</dt><dd>'+(x.h?hd(x)+' '+esc(HL[x.hs]||'Checking…'):'—')+'</dd></div><div><dt>Version</dt><dd>'+esc(x.v||'—')+'</dd></div><div><dt>Requirements</dt><dd>'+esc(x.r||'A modern browser')+'</dd></div><div><dt>Privacy</dt><dd><a href="/privacy" data-sheet data-title="Privacy Policy">Read the policy</a></dd></div></dl><h4>What’s new</h4>'+
+  (L.length?'<ul class="cl">'+L.map(function(e){return'<li><b>'+esc(e[0])+'</b> '+esc(e[1])+'</li>'}).join('')+'</ul>':'<p class="muted">No updates posted yet.</p>')+'</div>';det.hidden=false}
 function closeDet(){det.hidden=true}
 function share(id){var x=byId(id),u=location.origin+'/?open='+id;if(navigator.share)navigator.share({title:x.n,url:u}).catch(function(){});else if(navigator.clipboard)navigator.clipboard.writeText(u).then(function(){toast('Link copied')})}
 function pin(id){var k=pins.indexOf(id);k>-1?pins.splice(k,1):pins.unshift(id);sv('mc:pins',pins);toast(k>-1?'Unpinned':'Pinned');render()}
