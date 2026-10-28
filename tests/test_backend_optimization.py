@@ -40,7 +40,7 @@ class BackendOptimizationTests(unittest.TestCase):
     def test_removed_quick_add_endpoints_are_not_registered(self):
         self.assertEqual(self.client.get("/quick-add.js").status_code, 404)
         response = self.client.post("/api/catalog-add/verify", json={"password": "699360"})
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 405)
         self.assertNotIn(b"MAHI_CATALOG_PASSWORD", response.data)
 
     def test_unhandled_api_errors_return_safe_json(self):
