@@ -392,7 +392,9 @@ def catalog_add_verify():
         return response
     data = request.get_json(silent=True) or {}
     password = str(data.get("password") or "")
-    expected = os.environ.get("MAHI_CATALOG_PASSWORD", "6993").strip()
+    expected = os.environ.get("MAHI_CATALOG_PASSWORD", "")
+    if not expected:
+        return jsonify({"ok": False, "error": "Quick Add is not configured on the server."}), 503
     if not hmac.compare_digest(password, expected):
         return jsonify({"ok": False, "error": "Incorrect password."}), 401
     return jsonify({"ok": True})
@@ -430,7 +432,9 @@ def catalog_add_diagnose():
 
     data = request.get_json(silent=True) or {}
     password = str(data.get("password") or "")
-    expected = os.environ.get("MAHI_CATALOG_PASSWORD", "6993").strip()
+    expected = os.environ.get("MAHI_CATALOG_PASSWORD", "")
+    if not expected:
+        return jsonify({"ok": False, "message": "Quick Add is not configured on the server."}), 503
     if not hmac.compare_digest(password, expected):
         return jsonify({"ok": False, "message": "PIN verification failed. No GitHub check was run."}), 401
 
@@ -558,7 +562,9 @@ def catalog_add():
 
     data = request.get_json(silent=True) or {}
     password = str(data.get("password") or "")
-    expected = os.environ.get("MAHI_CATALOG_PASSWORD", "6993").strip()
+    expected = os.environ.get("MAHI_CATALOG_PASSWORD", "")
+    if not expected:
+        return jsonify({"ok": False, "error": "Quick Add is not configured on the server."}), 503
     if not hmac.compare_digest(password, expected):
         return jsonify({"ok": False, "error": "Incorrect password."}), 401
 
