@@ -51,6 +51,56 @@
       <p class="security-note"><strong>Security:</strong> API keys, admin PINs, management tokens, and session signing secrets are never displayed here. Keep them in Supabase Edge Function Secrets.</p>
     </section>
   </div>
+  <div class="supplemental-grid">
+    <section class="panel content-panel">
+      <div class="panel-heading"><div><p class="eyebrow">MAHIFLIX COLLECTION</p><h2>Websites &amp; Apps</h2><p class="muted">Manage the shared MahiFlix Websites and Apps collection. These entries are stored in Supabase and served to the MahiFlix page.</p></div><button class="button primary" type="button" id="newFlixButton">＋ Add entry</button></div>
+      <div class="table-wrap"><table><thead><tr><th>Name</th><th>Kind</th><th>Domain</th><th>Actions</th></tr></thead><tbody id="flixRows"><tr><td colspan="4" class="muted">Loading MahiFlix entries…</td></tr></tbody></table></div>
+      <form class="item-editor" id="flixForm" hidden>
+        <div class="editor-heading"><div><p class="eyebrow">MAHIFLIX EDITOR</p><h3 id="flixEditorTitle">Add entry</h3></div><button class="icon-button" type="button" id="cancelFlixEdit" aria-label="Close editor">×</button></div>
+        <input id="flixId" type="hidden">
+        <div class="form-grid">
+          <label>Kind<select id="flixKind"><option value="sites">Website</option><option value="apps">App</option></select></label>
+          <label>Name<input id="flixName" maxlength="80" required></label>
+          <label class="full">Public HTTPS URL<input id="flixUrl" type="url" maxlength="2048" required placeholder="https://example.com"></label>
+          <label class="full">Description<textarea id="flixDescription" maxlength="180" rows="2" placeholder="Short description"></textarea></label>
+        </div>
+        <div class="editor-actions"><span class="status" id="flixSaveStatus" role="status" aria-live="polite"></span><button class="button primary" type="submit" id="saveFlixButton">Save MahiFlix entry</button></div>
+      </form>
+    </section>
+    <section class="panel content-panel">
+      <div class="panel-heading"><div><p class="eyebrow">MAHIFRAME PROFILE</p><h2>Profile settings</h2><p class="muted">Update public profile fields. Social links and categories must be valid JSON arrays.</p></div></div>
+      <form id="profileForm">
+        <div class="form-grid">
+          <label>Name<input id="profileName" maxlength="100" required></label>
+          <label>Handle<input id="profileHandle" maxlength="40" required></label>
+          <label class="full">Bio<textarea id="profileBio" maxlength="600" rows="3"></textarea></label>
+          <label class="full">Avatar URL<input id="profileAvatar" type="url" maxlength="800" placeholder="https://..."></label>
+          <label class="full">Location<input id="profileLocation" maxlength="120"></label>
+          <label class="full">Social links JSON<textarea id="profileSocials" rows="3" spellcheck="false">[]</textarea></label>
+          <label class="full">Categories JSON<textarea id="profileCategories" rows="3" spellcheck="false">[]</textarea></label>
+          <label class="checkbox-field"><input id="profileVerified" type="checkbox"> Verified profile</label>
+        </div>
+        <div class="editor-actions"><span class="status" id="profileSaveStatus" role="status" aria-live="polite"></span><button class="button primary" type="submit" id="saveProfileButton">Save MahiFrame profile</button></div>
+      </form>
+    </section>
+    <section class="panel content-panel video-panel">
+      <div class="panel-heading"><div><p class="eyebrow">MAHIFRAME MEDIA</p><h2>Video moderation</h2><p class="muted">Edit metadata, publish, feature, or reorder ready videos. This panel never deletes storage objects.</p></div></div>
+      <div class="table-wrap"><table><thead><tr><th>Video</th><th>Status</th><th>Published</th><th>Featured</th><th>Actions</th></tr></thead><tbody id="videoRows"><tr><td colspan="5" class="muted">Loading MahiFrame media…</td></tr></tbody></table></div>
+      <form class="item-editor" id="videoForm" hidden>
+        <div class="editor-heading"><div><p class="eyebrow">VIDEO METADATA</p><h3 id="videoEditorTitle">Edit video</h3></div><button class="icon-button" type="button" id="cancelVideoEdit" aria-label="Close editor">×</button></div>
+        <input id="videoId" type="hidden">
+        <div class="form-grid">
+          <label class="full">Title<input id="videoTitle" maxlength="120" required></label>
+          <label class="full">Description<textarea id="videoDescription" maxlength="2000" rows="3"></textarea></label>
+          <label>Category<input id="videoCategory" maxlength="80"></label>
+          <label>Display order<input id="videoPosition" type="number" min="0" max="100000" required></label>
+          <label class="checkbox-field"><input id="videoPublished" type="checkbox"> Published</label>
+          <label class="checkbox-field"><input id="videoFeatured" type="checkbox"> Featured</label>
+        </div>
+        <div class="editor-actions"><span class="status" id="videoSaveStatus" role="status" aria-live="polite"></span><button class="button primary" type="submit" id="saveVideoButton">Save video metadata</button></div>
+      </form>
+    </section>
+  </div>
 </section>
 <p class="page-status" id="pageStatus" role="status" aria-live="polite"></p>
 </main>
