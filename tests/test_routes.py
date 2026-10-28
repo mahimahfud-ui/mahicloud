@@ -106,7 +106,10 @@ class MahiCloudRouteTests(unittest.TestCase):
         admin = self.client.get("/admin/")
         self.assertEqual(admin.status_code, 200)
         self.assertIn(b'id="loginForm"', admin.data)
-        self.assertIn(b'catalog-list', self.client.get("/admin/admin.js").data)
+        admin_script = self.client.get("/admin/admin.js").data
+        for action in (b"catalog-list", b"mahiflix-list", b"mframe-profile-save", b"mframe-videos-list"):
+            with self.subTest(action=action):
+                self.assertIn(action, admin_script)
 
     def test_browser_helper_guide_and_download_are_available_without_external_source_links(self):
         import io
