@@ -48,7 +48,7 @@ class CurrentMahiCloudDesignTests(unittest.TestCase):
 
     def test_quick_add_is_removed_and_premium_ai_launcher_is_present(self):
         self.assertEqual(self.client.get("/quick-add.js").status_code, 404)
-        self.assertEqual(self.client.post("/api/catalog-add", json={}).status_code, 404)
+        self.assertEqual(self.client.post("/api/catalog-add", json={}).status_code, 405)
         launcher = self.get_text("/mahi-ai-launcher.js")
         self.assertIn("Open Mahi-AI", launcher)
         self.assertIn('location.href = "/mahi-ai/"', launcher)
