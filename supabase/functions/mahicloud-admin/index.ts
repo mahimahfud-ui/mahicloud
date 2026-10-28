@@ -5,6 +5,7 @@ const APP_NAME = "mahicloud-admin";
 const SESSION_TTL_SECONDS = 4 * 60 * 60;
 const MAX_FAILED_LOGINS = 5;
 const LOGIN_WINDOW_MS = 15 * 60 * 1000;
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const DEFAULT_ORIGINS = [
   "https://mahimahfud-ui.github.io",
   "https://mahi-ai.onrender.com",
