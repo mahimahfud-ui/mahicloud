@@ -14,12 +14,10 @@ import requests
 
 from flask import Flask, jsonify, redirect, request, send_file, send_from_directory
 from werkzeug.exceptions import HTTPException, RequestEntityTooLarge
-from mahi_catalog import mahi_catalog_bp
 from theme_api import theme_bp
 
 app = Flask(__name__, static_folder="web", static_url_path="")
 app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024  # 10 MiB upload limit.
-app.register_blueprint(mahi_catalog_bp)
 app.register_blueprint(theme_bp)
 
 jobs = {}
@@ -342,12 +340,22 @@ def apps_index():
 
 
 
-# The former chat interface is hidden; catalog additions use the floating plus dialog.
-@app.route("/mahi-ai", defaults={"legacy_path": ""})
-@app.route("/mahi-ai/", defaults={"legacy_path": ""})
-@app.route("/mahi-ai/<path:legacy_path>")
-def hide_legacy_mahi_ai(legacy_path=""):
-    return redirect("/", code=302)
+# Native Mahi-AI workspace, served from the same origin (no iframe).
+@app.route("/mahi-ai", defaults={"workspace_path": ""})
+@app.route("/mahi-ai/", defaults={"workspace_path": ""})
+@app.route("/mahi-ai/<path:workspace_path>")
+def mahi_ai_workspace(workspace_path=""):
+    target = workspace_path or "index.html"
+    return send_from_directory(os.path.join(app.root_path, "web", "mahi-ai"), target)
+
+
+# Admin HTML is public shell only; every privileged operation is verified by mahicloud-admin.
+@app.route("/admin", defaults={"admin_path": ""})
+@app.route("/admin/", defaults={"admin_path": ""})
+@app.route("/admin/<path:admin_path>")
+def admin_workspace(admin_path=""):
+    target = admin_path or "index.html"
+    return send_from_directory(os.path.join(app.root_path, "web", "admin"), target)
 
 
 # Friendly MahiCloud route aliases. Canonical project routes remain unchanged.
@@ -772,18 +780,18 @@ def handle_unexpected_error(error):
 @app.after_request
 def add_security_headers(response):
     # Inject one shared quick-add launcher across HTML pages without changing page designs.
-    if response.status_code == 200 and response.mimetype == "text/html" and not request.path.startswith("/mahi-ai"):
+    if response.status_code == 200 and response.mimetype == "text/html" and not request.path.startswith(("/mahi-ai", "/admin")):
         try:
             response.direct_passthrough = False
             body = response.get_data()
             lowered = body.lower()
-            tag = b'<script defer src="/quick-add.js"></script>'
-            if b"quick-add.js" not in lowered:
+            tag = b'<script defer src="/mahi-ai-launcher.js"></script>'
+            if b"mahi-ai-launcher.js" not in lowered:
                 position = lowered.rfind(b"</body>")
                 if position >= 0:
                     response.set_data(body[:position] + tag + b"\n" + body[position:])
         except Exception:
-            pass
+            app.logger.warning("Could not inject the Mahi-AI launcher on %s", request.path)
     # APIs often contain live state or user-specific data; never let shared/browser caches
     # replay them accidentally. Static project data is shipped with the front-end, not fetched
     # from a catalogue database on every keystroke.

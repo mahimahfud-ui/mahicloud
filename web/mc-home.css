@@ -386,3 +386,9 @@ html body #mahi-catalog-plus:focus-visible{outline:2px solid var(--hi)!important
   #sheet .tt { flex: 1 1 auto; min-width: 0; max-width: none; }
   #sheet .tt small { max-width: 32vw; }
 }
+
+
+/* Managed image icons stay consistently padded within every tile. */
+.project-icon-image{display:block;width:58%;height:58%;max-width:100%;max-height:100%;object-fit:contain;position:relative;z-index:1;border-radius:10px}
+.ic img.project-icon-image{width:58%;height:58%}
+.cmd-i b img.project-icon-image{width:62%;height:62%}

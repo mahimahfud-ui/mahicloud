@@ -1,2 +1,419 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><meta http-equiv="refresh" content="0;url=/"><title>MahiCloud</title><script>location.replace("/");</script></head><body><p>This page has moved. <a href="/">Return to MahiCloud</a>.</p></body></html>
+<html lang="en">
+<head>
+  <link rel="preconnect" href="https://husydmiujigyonlxbuuj.supabase.co" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+  <meta name="theme-color" content="#090b10">
+  <meta name="description" content="MahiCloud — one helpful assistant for your everyday tasks.">
+  <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/mahimahfud-ui/Mahi-AI/main/Cybernetic%20Half-Face%20Portrait.png">
+  <title>MahiCloud AI — Integrated Workspace</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css?v=20261027thinkmode1">
+  <link rel="stylesheet" href="./theme.css?v=20261024v5">
+  <link rel="stylesheet" href="./motion.css">
+  <link rel="stylesheet" href="./craft.css">
+  <link rel="stylesheet" href="./motion-b.css">
+  <link rel="stylesheet" href="./ui-overrides.css?v=20261027mobilemenu1">
+  <link rel="stylesheet" href="./code-blocks.css?v=20261025">
+  <link rel="stylesheet" href="./admin-control.css?v=20261025admin1">
+  <link rel="stylesheet" href="./ai-intro.css?v=20261027tapmaruf1">
+  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/dist/umd/supabase.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/marked@15.0.7/marked.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/dompurify@3.2.5/dist/purify.min.js"></script>
+  <script src="./config.js"></script>
+  <script src="./themes.js?v=20261024v2"></script>
+  <script src="./layout.js?v=20261024v2"></script>
+  <script src="./motion.js" defer></script>
+  <script src="./app.js?v=20261027thinkmode1" defer></script>
+  <script src="./admin-control.js?v=20261025admin1" defer></script>
+  <script src="./code-blocks.js?v=20261025" defer></script>
+  <script src="./motion-b.js" defer></script>
+  <script src="./ai-intro.js?v=20261027tapmaruf1" defer></script>
+</head>
+<body>
+  <div class="ai-intro" id="aiIntro" aria-hidden="false">
+    <div class="ai-intro-grid" aria-hidden="true"></div>
+    <div class="ai-intro-glow ai-intro-glow--left" aria-hidden="true"></div>
+    <div class="ai-intro-glow ai-intro-glow--right" aria-hidden="true"></div>
+    <div class="ai-intro-content">
+      <div class="ai-intro-core" aria-hidden="true">
+        <div class="ai-intro-ring ai-intro-ring--pulse"></div>
+        <div class="ai-intro-orbit ai-intro-orbit--outer">
+          <span class="ai-intro-token ai-intro-token--spark" aria-hidden="true">✦</span>
+          <span class="ai-intro-token ai-intro-token--chat" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false"><path d="M20 11.5a7.8 7.8 0 0 1-8 7.5 8.5 8.5 0 0 1-3.4-.7L4 19l.9-3.7A7.2 7.2 0 0 1 4 11.5 7.8 7.8 0 0 1 12 4a7.8 7.8 0 0 1 8 7.5Z"/><path d="M8.5 11.5h.1m3.4 0h.1m3.4 0h.1"/></svg>
+          </span>
+          <span class="ai-intro-token ai-intro-token--typing" aria-hidden="true"><i></i><i></i><i></i></span>
+        </div>
+        <div class="ai-intro-orbit ai-intro-orbit--inner">
+          <span class="ai-intro-token ai-intro-token--prompt" aria-hidden="true">Aa<i></i></span>
+          <span class="ai-intro-token ai-intro-token--reply" aria-hidden="true"><i></i><i></i><i></i></span>
+        </div>
+        <span class="ai-intro-particle ai-intro-particle--one"></span>
+        <span class="ai-intro-particle ai-intro-particle--two"></span>
+        <span class="ai-intro-particle ai-intro-particle--three"></span>
+        <div class="ai-intro-logo-shell">
+          <span class="ai-intro-logo-aura"></span>
+          <img class="ai-intro-logo" src="https://raw.githubusercontent.com/mahimahfud-ui/Mahi-AI/main/Cybernetic%20Half-Face%20Portrait.png" alt="MahiCloud official logo">
+        </div>
+      </div>
+      <div class="ai-intro-copy">
+        <span class="ai-intro-eyebrow"><span></span> YOUR AI SPACE</span>
+        <h1>MahiCloud <strong>AI</strong></h1>
+        <p>Think clearly. Create freely. Explore more.</p>
+      </div>
+      <div class="ai-intro-progress" aria-hidden="true"><span></span></div>
+      
+    </div>
+  </div>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand-row">
+        <img class="brand-logo" src="https://raw.githubusercontent.com/mahimahfud-ui/Mahi-AI/main/Cybernetic%20Half-Face%20Portrait.png" alt="" aria-hidden="true">
+        <div class="brand-copy"><strong>MahiCloud</strong><span>Your everyday assistant</span></div><a class="mahi-home-link" href="/" aria-label="Return to MahiCloud home">Home ↗</a>
+        <button class="icon-button mobile-close" id="closeSidebar" aria-label="Close menu" title="Close menu"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      </div>
+      <button class="new-chat" id="newChat"><span class="plus" aria-hidden="true"><svg class="ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span><span>New chat</span><kbd>Ctrl K</kbd></button>
+      <button class="api-library-button" id="openApiExplorer" type="button" aria-haspopup="dialog" aria-controls="apiExplorer">
+        <span class="api-library-icon" aria-hidden="true"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18ZM3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9S14.5 18.4 12 21c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3Z"/></svg></span>
+        <span>Public API Library</span>
+        <span class="api-library-arrow" aria-hidden="true"><svg class="ico" viewBox="0 0 24 24"><path d="M7 17 17 7M8 7h9v9"/></svg></span>
+      </button>
+      <div class="history-heading"><span>Recents</span><button class="text-button" id="refreshChats" aria-label="Refresh chats" title="Refresh chats">↻</button></div>
+      <label class="chat-search-wrap"><span class="sr-only">Search conversations</span><input id="chatSearch" type="search" placeholder="Search conversations…" autocomplete="off"></label>
+      <nav id="chatList" class="chat-list" aria-label="Recent conversations">
+      <div class="chat-skeleton" aria-hidden="true">
+        <div class="skel-row" style="--i:0"><span class="skel skel-dot"></span><span class="skel skel-line" style="width:74%"></span></div>
+        <div class="skel-row" style="--i:1"><span class="skel skel-dot"></span><span class="skel skel-line" style="width:58%"></span></div>
+        <div class="skel-row" style="--i:2"><span class="skel skel-dot"></span><span class="skel skel-line" style="width:82%"></span></div>
+        <div class="skel-row" style="--i:3"><span class="skel skel-dot"></span><span class="skel skel-line" style="width:49%"></span></div>
+        <div class="skel-row" style="--i:4"><span class="skel skel-dot"></span><span class="skel skel-line" style="width:66%"></span></div>
+      </div>
+    </nav>
+      
+      <section class="sidebar-settings" aria-label="Settings and preferences">
+        <button class="settings-trigger" id="toggleSettings" type="button" aria-expanded="false" aria-controls="settingsPanel">
+          <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8.4a3.6 3.6 0 1 0 0 7.2 3.6 3.6 0 0 0 0-7.2Z"/><path d="m19.4 13.5 1.1.9-1.7 2.9-1.4-.5a7.6 7.6 0 0 1-1.6.9l-.2 1.5h-3.3l-.2-1.5a7.6 7.6 0 0 1-1.6-.9l-1.4.5-1.7-2.9 1.1-.9a7.1 7.1 0 0 1 0-1.8l-1.1-.9 1.7-2.9 1.4.5a7.6 7.6 0 0 1 1.6-.9l.2-1.5h3.3l.2 1.5a7.6 7.6 0 0 1 1.6.9l1.4-.5 1.7 2.9-1.1.9a7.1 7.1 0 0 1 0 1.8Z"/></svg>
+          <span>Settings &amp; preferences</span>
+          <svg class="settings-chevron ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5"/></svg>
+        </button>
+        <div class="settings-panel" id="settingsPanel" hidden>
+          <section class="settings-group" aria-labelledby="generalSettingsTitle">
+            <h3 class="settings-group-title" id="generalSettingsTitle">General</h3>
+            <div class="setting-row">
+              <div class="setting-copy"><span class="setting-title">Appearance</span><small>Choose dark or light mode</small></div>
+              <button class="theme-toggle" id="themeToggle" type="button" role="switch" aria-checked="false" aria-label="Toggle light mode">
+                <span class="theme-toggle-knob" aria-hidden="true"></span><span id="themeToggleLabel">Dark</span>
+              </button>
+            </div>
+            <div class="setting-row">
+              <div class="setting-copy"><span class="setting-title">Enter sends message</span><small>Turn off to use Ctrl/⌘ + Enter to send</small></div>
+              <button class="setting-switch" id="enterToSendToggle" type="button" role="switch" aria-checked="true" aria-label="Enter sends message"><span></span></button>
+            </div>
+            <label class="setting-row" for="chatDensitySelect">
+              <span class="setting-copy"><span class="setting-title">Conversation spacing</span><small>Control the space between messages</small></span>
+              <select class="setting-select" id="chatDensitySelect"><option value="comfortable">Comfortable</option><option value="compact">Compact</option></select>
+            </label>
+            <label class="setting-row" for="chatFontSizeSelect">
+              <span class="setting-copy"><span class="setting-title">Message text size</span><small>Adjust chat readability</small></span>
+              <select class="setting-select" id="chatFontSizeSelect"><option value="small">Small</option><option value="default">Default</option><option value="large">Large</option></select>
+            </label>
+            <div class="setting-row">
+              <div class="setting-copy"><span class="setting-title">Auto-scroll</span><small>Keep the latest reply in view</small></div>
+              <button class="setting-switch" id="autoScrollToggle" type="button" role="switch" aria-checked="true" aria-label="Auto-scroll to latest reply"><span></span></button>
+            </div>
+          </section>
+          <section class="settings-group" aria-labelledby="personalizationSettingsTitle">
+            <h3 class="settings-group-title" id="personalizationSettingsTitle">Personalization</h3>
+            <label class="settings-field" for="responseStyleSelect"><span class="setting-title">Default response style</span>
+              <select class="setting-select setting-select-wide" id="responseStyleSelect">
+                <option value="default">Balanced</option><option value="friendly">Friendly</option><option value="concise">Concise</option><option value="detailed">Detailed</option><option value="professional">Professional</option>
+              </select>
+            </label>
+            <form class="settings-field" id="customInstructionsForm">
+              <label class="setting-title" for="customInstructionsInput">Custom instructions</label>
+              <small class="settings-help">Preferences for future replies, such as language, tone, or how you like explanations. Safety and accuracy rules still apply.</small>
+              <textarea class="setting-textarea" id="customInstructionsInput" rows="3" maxlength="3000" placeholder="Example: Reply in Bangla unless I ask otherwise. Explain technical steps simply."></textarea>
+              <div class="settings-save-row"><span class="setting-status" id="customInstructionsStatus" role="status">Saved on this device when you press Save.</span><button class="setting-save-button" type="submit">Save</button></div>
+            </form>
+            <form class="name-setting-form" id="displayNameForm">
+              <label for="displayNameInput">Your display name</label>
+              <div class="name-setting-control"><input id="displayNameInput" type="text" maxlength="32" autocomplete="nickname" placeholder="e.g. Mahi"><button type="submit">Save</button></div>
+              <p class="setting-status" id="nameSaveStatus" role="status">Stored in this browser only.</p>
+            </form>
+          </section>
+          <section class="settings-group" aria-labelledby="voiceSettingsTitle">
+            <h3 class="settings-group-title" id="voiceSettingsTitle">Voice</h3>
+            <div class="setting-row">
+              <div class="setting-copy"><span class="setting-title">Read replies aloud</span><small>Automatically speak new responses when supported</small></div>
+              <button class="setting-switch" id="autoReadAloudToggle" type="button" role="switch" aria-checked="false" aria-label="Read replies aloud automatically"><span></span></button>
+            </div>
+          </section>
+          <section class="settings-group" aria-labelledby="dataSettingsTitle">
+            <h3 class="settings-group-title" id="dataSettingsTitle">Data controls</h3>
+            <p class="settings-help">Export the current conversation, or reset chat preferences stored in this browser. Exporting is available for the current chat only.</p>
+            <div class="settings-actions">
+              <button class="setting-action-button" id="settingsExportMarkdown" type="button">Export Markdown</button>
+              <button class="setting-action-button" id="settingsExportJson" type="button">Export JSON</button>
+              <button class="setting-action-button" id="resetChatPreferences" type="button">Reset chat preferences</button>
+            </div>
+          </section>
+                   <section class="settings-group admin-launch-group" aria-labelledby="adminControlLaunchTitle">
+             <h3 class="settings-group-title" id="adminControlLaunchTitle">Administration</h3>
+             <div class="setting-row admin-launch-row">
+               <div class="setting-copy"><span class="setting-title">AI Control Centre</span><small>Manage global AI instructions and topic-specific rules.</small></div>
+               <button class="setting-action-button admin-launch-button" id="openAdminControl" type="button">Admin Login <span aria-hidden="true">↗</span></button>
+             </div>
+           </section>
+</div>
+      </section>
+      <section class="sidebar-social" aria-label="Social and contact links">
+        <div class="sidebar-social-title">Social &amp; contact</div>
+        <div class="social-link-list">
+          <a class="social-link" href="https://www.instagram.com/mahimahfud?obrf=dnhudG1rbmsxeWs=" target="_blank" rel="noopener noreferrer" aria-label="Instagram (opens in a new tab)">
+            <svg class="social-icon instagram-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="4.1" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="17.6" cy="6.6" r="1.15" fill="currentColor"/></svg>
+            <span>Instagram</span><span class="social-external" aria-hidden="true">↗</span>
+          </a>
+          <a class="social-link" href="https://wa.me/8801819856148" target="_blank" rel="noopener noreferrer" aria-label="Chat on WhatsApp (opens in a new tab)">
+            <svg class="social-icon whatsapp-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 11.8a8.5 8.5 0 0 1-12.6 7.4L3.5 20l.9-4.2a8.5 8.5 0 1 1 16.1-4Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8.7 8.1c.2-.5.5-.5.8-.5h.5c.2 0 .4.1.5.4l.7 1.7c.1.2.1.4-.1.6l-.6.7c-.2.2-.2.4-.1.6.5.9 1.2 1.6 2.1 2.1.2.1.4.1.6-.1l.8-.9c.2-.2.4-.2.6-.1l1.6.8c.2.1.3.3.3.5 0 .4-.2 1-.6 1.3-.4.4-1 .6-1.7.5-1.1-.2-2.4-.8-3.6-1.9-1.4-1.3-2.2-2.8-2.4-3.8-.2-.8.1-1.5.6-1.9Z" fill="currentColor"/></svg>
+            <span>WhatsApp</span><span class="social-external" aria-hidden="true">↗</span>
+          </a>
+        </div>
+      </section>
+      <div class="sidebar-bottom">
+        <div class="privacy-note"><div><strong>Private by design</strong><small>Your chats belong to your session.</small></div></div>
+        <div class="profile-row"><div class="avatar" id="profileAvatar">Y</div><div class="profile-copy"><strong id="profileDisplayName">You</strong><small id="sessionLabel">Preparing your workspace…</small></div></div>
+      </div>
+      <div class="sidebar-resize-handle" id="sidebarResizeHandle" role="separator" tabindex="0" aria-label="Resize chat history sidebar" aria-orientation="vertical" aria-valuemin="220" aria-valuemax="440" aria-valuenow="260" title="Drag to resize chat history"></div>
+    </aside>
+
+    <main class="main-panel">
+      <header class="topbar">
+        <button class="icon-button mobile-menu" id="openSidebar" aria-label="Toggle sidebar" title="Toggle sidebar" aria-controls="sidebar" aria-expanded="false"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+        <div class="topbar-title"><img class="small-mark" src="https://raw.githubusercontent.com/mahimahfud-ui/Mahi-AI/main/Cybernetic%20Half-Face%20Portrait.png" alt="Official website logo" width="40" height="40"></div>
+        <div class="topbar-right">
+          <button class="header-tool-button" id="exportMarkdownButton" type="button" title="Export conversation as Markdown" aria-label="Export conversation as Markdown">↓ <span>MD</span></button>
+          <button class="header-tool-button" id="exportJsonButton" type="button" title="Export conversation as JSON" aria-label="Export conversation as JSON">{ } <span>JSON</span></button>
+          <button class="temporary-chat-button" id="temporaryChatButton" type="button" aria-pressed="false" title="Start a temporary chat that is not saved to chat history or long-term memory">◌ <span>Temporary</span></button>
+          <button class="account-button" id="accountButton" type="button" aria-label="Sign in or create an account" title="Sign in or create an account"><span class="account-button-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0"/></svg></span><span id="accountButtonLabel">Sign in</span></button>
+          <span class="secure-label">Ready to help</span>
+        </div>
+      </header>
+
+      <section class="conversation-area" id="conversationArea">
+        <section class="welcome" id="welcome">
+          <div class="welcome-glow"></div>
+          <div class="eyebrow"><span class="spark" aria-hidden="true"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9Z"/></svg></span>Your thinking partner</div>
+          <h1>Big ideas start<br>with <span>one question.</span></h1>
+          <p class="welcome-copy">Ask anything. Solve a problem, write something great, learn a new skill, or turn an idea into a plan.</p>
+          <div class="suggestion-grid">
+            <button class="suggestion-card" data-prompt="Help me break a difficult problem into clear, manageable steps."><span class="suggestion-icon violet" aria-hidden="true"><svg class="ico" viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3Z"/></svg></span><span><strong>Think it through</strong><small>Break a difficult problem into steps</small></span><span class="suggestion-arrow" aria-hidden="true"><svg class="ico" viewBox="0 0 24 24"><path d="M7 17 17 7M8 7h9v9"/></svg></span></button>
+            <button class="suggestion-card" data-prompt="Help me write a clear, engaging piece of writing. Ask any necessary questions first."><span class="suggestion-icon blue" aria-hidden="true"><svg class="ico" viewBox="0 0 24 24"><path d="M4 20l1-4L16.5 4.5a2.1 2.1 0 0 1 3 3L8 19l-4 1ZM14 7l3 3"/></svg></span><span><strong>Write something</strong><small>Turn rough ideas into clear words</small></span><span class="suggestion-arrow" aria-hidden="true"><svg class="ico" viewBox="0 0 24 24"><path d="M7 17 17 7M8 7h9v9"/></svg></span></button>
+            <button class="suggestion-card" data-prompt="Teach me a new concept with a simple explanation and a practical example."><span class="suggestion-icon amber" aria-hidden="true"><svg class="ico" viewBox="0 0 24 24"><path d="M12 6.5C10.5 5.3 8.5 5 5 5v13c3.5 0 5.5.3 7 1.5 1.5-1.2 3.5-1.5 7-1.5V5c-3.5 0-5.5.3-7 1.5ZM12 6.5v13"/></svg></span><span><strong>Learn a concept</strong><small>Understand it with examples</small></span><span class="suggestion-arrow" aria-hidden="true"><svg class="ico" viewBox="0 0 24 24"><path d="M7 17 17 7M8 7h9v9"/></svg></span></button>
+            <button class="suggestion-card" data-prompt="Help me debug or build a coding project. Start by asking what I am trying to make."><span class="suggestion-icon green" aria-hidden="true"><svg class="ico" viewBox="0 0 24 24"><path d="m8 8-4 4 4 4M16 8l4 4-4 4M13.5 6l-3 12"/></svg></span><span><strong>Build with code</strong><small>Debug, plan, or create a project</small></span><span class="suggestion-arrow" aria-hidden="true"><svg class="ico" viewBox="0 0 24 24"><path d="M7 17 17 7M8 7h9v9"/></svg></span></button>
+          </div>
+        </section>
+        <section class="messages" id="messages" aria-live="polite" aria-label="Conversation"></section>
+        <div class="error-banner" id="errorBanner" role="alert" hidden></div>
+      </section>
+
+      <footer class="composer-wrap">
+        <form class="composer" id="chatForm">
+          <div class="draft-notice" id="draftNotice" hidden><span>Editing a previous message. Sending replaces that turn and the conversation after it.</span><button type="button" id="cancelEditButton">Cancel</button></div>
+          <input id="fileInput" type="file" multiple hidden>
+          <div id="attachmentList" class="attachment-list" hidden aria-label="Selected attachments"></div>
+          <label for="promptInput" class="sr-only">Message MahiCloud</label>
+          <textarea id="promptInput" rows="1" maxlength="12000" placeholder="Message MahiCloud…" autocomplete="off" enterkeyhint="send"></textarea>
+          <div class="composer-bottom"><div class="composer-left-actions"><button class="attach-button" id="attachButton" type="button" aria-label="Attach files" title="Attach files (any file type)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m20.2 11.3-8.7 8.7a5.1 5.1 0 0 1-7.2-7.2l9.2-9.2a3.4 3.4 0 0 1 4.8 4.8l-9.2 9.2a1.7 1.7 0 0 1-2.4-2.4l8.2-8.2"/></svg><span>Attach</span></button><button class="voice-mode-button" id="voiceModeButton" type="button" aria-label="Start voice conversation" title="Talk with MahiCloud"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="2.5" width="6" height="12" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V22M8.5 22h7"/></svg><span>Voice</span></button><button class="think-mode-button" id="thinkModeButton" type="button" aria-pressed="false" aria-label="Toggle Think mode" title="Think mode is off: use the normal fast response route"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6.5 6.5 0 0 0-3.6 11.9c.7.5 1.1 1.2 1.1 2.1h5c0-.9.4-1.6 1.1-2.1A6.5 6.5 0 0 0 12 3Z"/><path d="m19 2 .6 1.8L21.5 4.5l-1.9.7L19 7l-.6-1.8-1.9-.7 1.9-.7Z"/></svg><span>Think</span></button><span class="composer-hint"><kbd>Enter</kbd> to send <kbd>Shift</kbd> + <kbd>Enter</kbd> for a new line</span></div><div class="composer-actions"><span class="char-count" id="charCount">0 / 12000</span><button class="stop-button" id="stopButton" type="button" hidden aria-label="Stop generating" title="Stop generating"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7h10v10H7z"/></svg><span>Stop</span></button><button class="send-button" id="sendButton" type="submit" aria-label="Send message" title="Send message"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M6.5 10.5 12 5l5.5 5.5"/></svg></button></div></div>
+        </form>
+        <p class="footer-note">MahiCloud can make mistakes.</p>
+      </footer>
+    </main>
+  </div>
+  <div class="mobile-scrim" id="mobileScrim"></div>
+  <div class="account-modal" id="accountModal" hidden>
+    <div class="account-modal-scrim" data-account-close></div>
+    <section class="account-modal-panel" role="dialog" aria-modal="true" aria-labelledby="accountDialogTitle" aria-describedby="accountDialogDescription">
+      <header class="account-modal-header">
+        <div class="account-modal-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0"/></svg></div>
+        <div class="account-modal-heading">
+          <div class="account-modal-eyebrow">MAHICLOUD · YOUR WORKSPACE</div>
+          <h2 id="accountDialogTitle">Save your chats</h2>
+          <p id="accountDialogDescription">Use any valid email address or a phone number with its international country code.</p>
+        </div>
+        <button class="icon-button account-modal-close" type="button" data-account-close aria-label="Close account dialog" title="Close">×</button>
+      </header>
+      <div id="accountAuthPanel">
+        <div class="account-method-switch" id="accountMethodSwitch" aria-label="Choose sign-in method">
+          <button type="button" class="is-active" data-account-method="email" aria-pressed="true">Email</button>
+          <button type="button" data-account-method="phone" aria-pressed="false">Phone number</button>
+        </div>
+        <div class="account-mode-switch" id="accountModeSwitch" aria-label="Choose account action">
+          <button type="button" class="is-active" data-account-mode="register" aria-pressed="true">Create account</button>
+          <button type="button" data-account-mode="login" aria-pressed="false">Log in</button>
+        </div>
+        <form class="account-form" id="accountForm">
+          <div id="accountEmailFields">
+            <label for="accountEmailInput">Email address</label>
+            <input id="accountEmailInput" name="email" type="email" placeholder="you@example.com" autocomplete="email" inputmode="email" maxlength="254" required>
+            <label for="accountPasswordInput">Password</label>
+            <input id="accountPasswordInput" name="password" type="password" placeholder="At least 8 characters" autocomplete="new-password" minlength="8" required>
+            <div id="accountPasswordConfirmWrap">
+              <label for="accountPasswordConfirm">Confirm password</label>
+              <input id="accountPasswordConfirm" name="passwordConfirm" type="password" placeholder="Enter the same password again" autocomplete="new-password" minlength="8" required>
+            </div>
+          </div>
+          <div id="accountPhoneFields" hidden>
+            <label for="accountPhoneInput">Phone number with country code</label>
+            <input id="accountPhoneInput" name="phone" type="tel" placeholder="+8801712345678" autocomplete="tel" inputmode="tel" maxlength="24" aria-describedby="accountPhoneHint">
+            <p class="account-field-hint" id="accountPhoneHint">Use the international format beginning with +, for example +880 for Bangladesh or +1 for the US/Canada.</p>
+            <div id="accountOtpGroup" hidden>
+              <label for="accountOtpInput">SMS verification code</label>
+              <input id="accountOtpInput" name="otp" type="text" placeholder="Enter the code" inputmode="numeric" autocomplete="one-time-code" maxlength="8" pattern="[0-9]{4,8}">
+              <button class="account-resend-button" id="accountResendCode" type="button" hidden>Resend code</button>
+            </div>
+          </div>
+          <button class="account-submit-button" id="accountSubmitButton" type="submit">Create account</button>
+        </form>
+      </div>
+      <div class="account-summary" id="accountSummary" hidden>
+        <div class="account-summary-card">
+          <span class="account-summary-label">SIGNED IN AS</span>
+          <strong id="accountSummaryIdentity">Your account</strong>
+          <p id="accountSummaryName">Your chat history is saved to your account.</p>
+        </div>
+        <button class="account-signout-button" id="accountSignOut" type="button">Sign out / switch account</button>
+      </div>
+      <div class="account-status" id="accountStatus" role="status" aria-live="polite" hidden></div>
+      <p class="account-privacy-note"><span aria-hidden="true">✓</span> Your chats are private to your account. Sign in on another device to access your saved history.</p>
+    </section>
+  </div>
+  <div class="voice-overlay" id="voiceOverlay" hidden>
+    <div class="voice-overlay-scrim" data-voice-close></div>
+    <section class="voice-panel" role="dialog" aria-modal="true" aria-labelledby="voiceModeTitle" aria-describedby="voiceModeDescription">
+      <header class="voice-panel-header">
+        <div class="voice-brand">
+          <div class="voice-brand-mark" aria-hidden="true"><img src="https://raw.githubusercontent.com/mahimahfud-ui/Mahi-AI/main/Cybernetic%20Half-Face%20Portrait.png" alt=""></div>
+          <div><h2 id="voiceModeTitle">Voice with MahiCloud</h2><p id="voiceModeDescription">Talk in any language. I’ll detect it and reply aloud.</p></div>
+        </div>
+        <button class="icon-button voice-close" type="button" data-voice-close aria-label="End voice conversation" title="Close voice mode"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      </header>
+      <div class="voice-stage" id="voiceStage" data-state="idle">
+        <div class="voice-orb-wrap" aria-hidden="true"><div class="voice-orb"><span></span><i></i><b></b></div></div>
+        <div class="voice-status" id="voiceStatus" role="status" aria-live="polite">Ready to talk</div>
+        <p class="voice-transcript" id="voiceTranscript" aria-live="polite">Tap the microphone and start speaking.</p>
+        <p class="voice-interim" id="voiceInterim" aria-hidden="true"></p>
+      </div>
+      <footer class="voice-panel-controls">
+        <button class="voice-mic-button" id="voiceMicButton" type="button" aria-label="Start listening" title="Start or pause listening"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="2.5" width="6" height="12" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V22M8.5 22h7"/></svg></button>
+        <button class="voice-end-button" id="voiceEndButton" type="button">End voice</button>
+      </footer>
+      <p class="voice-privacy-note">When you start voice mode, your browser asks for microphone access if needed. Pause briefly after speaking; MahiCloud detects your language, replies aloud, then listens for your next turn. Speech voice availability depends on your device.</p>
+    </section>
+  </div>
+  <div class="api-explorer" id="apiExplorer" hidden>
+    <div class="api-explorer-scrim" data-api-close></div>
+    <section class="api-explorer-panel" role="dialog" aria-modal="true" aria-labelledby="apiExplorerTitle" aria-describedby="apiExplorerDescription">
+      <header class="api-explorer-header">
+        <div class="api-explorer-brand">
+          <div class="api-explorer-brand-icon" aria-hidden="true"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18ZM3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9S14.5 18.4 12 21c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3Z"/></svg></div>
+          <div>
+            <div class="api-explorer-kicker">Developer tools</div>
+            <h2 id="apiExplorerTitle">Public API Library</h2>
+            <p id="apiExplorerDescription">Discover community-listed APIs for your next project.</p>
+          </div>
+        </div>
+        <button class="icon-button api-explorer-close" id="closeApiExplorer" type="button" aria-label="Close API Library" title="Close"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      </header>
+      <div class="api-explorer-controls" aria-label="Filter API directory">
+        <label class="api-filter api-search-filter">
+          <span>Search</span>
+          <input type="search" id="apiSearch" placeholder="Search APIs or descriptions…" autocomplete="off">
+        </label>
+        <label class="api-filter">
+          <span>Category</span>
+          <select id="apiCategory"><option value="">All categories</option></select>
+        </label>
+        <label class="api-filter">
+          <span>Authentication</span>
+          <select id="apiAuth">
+            <option value="">Any auth</option>
+            <option value="none">No auth</option>
+            <option value="required">Auth required</option>
+          </select>
+        </label>
+        <label class="api-filter">
+          <span>HTTPS</span>
+          <select id="apiHttps"><option value="">Any</option><option value="yes">HTTPS</option><option value="no">No HTTPS</option></select>
+        </label>
+        <label class="api-filter">
+          <span>Browser CORS</span>
+          <select id="apiCors"><option value="">Any</option><option value="yes">Enabled</option><option value="no">Not enabled</option></select>
+        </label>
+      </div>
+      <div class="api-explorer-body">
+        <div class="api-explorer-status" id="apiExplorerStatus" role="status" aria-live="polite">Loading community API directory…</div>
+        <div class="api-explorer-grid" id="apiExplorerResults"></div>
+        <div class="api-explorer-more">
+          <span id="apiResultCount"></span>
+          <button class="api-load-more" id="apiLoadMore" type="button" hidden>Load more APIs</button>
+        </div>
+      </div>
+      <footer class="api-explorer-footer">
+        <p>Community-maintained catalogue. Individual APIs have their own limits, terms, and key requirements. Never paste private API keys into chat.</p>
+        <a href="https://github.com/public-apis/public-apis" target="_blank" rel="noopener noreferrer">Source repository <span aria-hidden="true">↗</span></a>
+      </footer>
+    </section>
+  </div>
+  <div class="admin-overlay" id="adminControlOverlay" hidden>
+    <div class="admin-overlay-backdrop" data-admin-close aria-hidden="true"></div>
+    <section class="admin-overlay-dialog" role="dialog" aria-modal="true" aria-labelledby="adminOverlayTitle" tabindex="-1">
+      <header class="admin-overlay-header">
+        <div class="admin-overlay-brand"><span class="admin-eyebrow">MAHICLOUD · PRIVATE WORKSPACE</span><h2 id="adminOverlayTitle">Admin Control Centre</h2><p>Secure access to owner-managed AI instructions.</p></div>
+        <button type="button" class="admin-overlay-close" id="adminCloseOverlay" aria-label="Close admin control centre" title="Close admin control centre">×</button>
+      </header>
+      <div class="admin-overlay-scroll">
+        <div class="admin-settings-page" id="adminSettingsContent">
+                          <div class="settings-page-head"><h3>AI Control Centre</h3><p>Owner-only settings for global AI instructions, categories and subcategories. Saved instructions apply to new conversations for every user.</p></div>
+                          <div class="admin-lock-card" id="adminLoginView">
+                            <div class="admin-lock-art" aria-hidden="true"><span>✦</span><i></i><i></i><i></i></div>
+                            <div class="admin-lock-copy"><span class="admin-eyebrow">MAHICLOUD · RESTRICTED AREA</span><h4>Administrator sign-in</h4><p>Unlock the private control panel to manage the assistant's behavior and instruction library.</p></div>
+                            <form id="adminLoginForm" class="admin-login-form" autocomplete="on">
+                              <label for="adminPinInput">Admin passcode</label>
+                              <div class="admin-login-line"><input id="adminPinInput" name="admin-pin" type="password" inputmode="numeric" autocomplete="current-password" maxlength="128" placeholder="Enter your passcode" required><button class="settings-action primary" id="adminLoginButton" type="submit">Unlock panel <span aria-hidden="true">↗</span></button></div>
+                              <p class="admin-inline-status" id="adminLoginStatus" role="status" aria-live="polite">Login is verified on the server. The passcode is never stored in this browser.</p>
+                            </form>
+                          </div>
+                          <div class="admin-console" id="adminConsole" hidden>
+                            <div class="admin-console-head">
+                              <div><span class="admin-eyebrow">MAHICLOUD · ROOT CONTROL</span><h4>Assistant configuration</h4><p>Manage the system's owner-defined response guidance. Provider secrets remain protected in Supabase.</p></div>
+                              <div class="admin-console-actions"><button class="settings-action" id="adminRefresh" type="button">↻ Refresh</button><button class="settings-action danger" id="adminLogout" type="button">Lock panel</button></div>
+                            </div>
+                            <div class="admin-status-cards">
+                              <div class="admin-status-card"><span class="admin-status-label">Instruction engine</span><strong id="adminEngineState">Enabled</strong><small>Applies to new requests</small></div>
+                              <div class="admin-status-card"><span class="admin-status-label">Instruction categories</span><strong id="adminCategoryCount">0</strong><small>Global and topic-specific rules</small></div>
+                              <div class="admin-status-card"><span class="admin-status-label">Storage</span><strong>Server-side</strong><small>Private Supabase database</small></div>
+                            </div>
+                            <div class="admin-workspace">
+                              <aside class="admin-category-rail" aria-label="Instruction categories">
+                                <div class="admin-rail-head"><span>CONFIGURATION</span><span id="adminRailCount">0</span></div>
+                                <button class="admin-category-item is-active" type="button" data-admin-select="global"><span class="admin-category-glyph">✦</span><span><strong>Global instructions</strong><small>Applied to all topics</small></span></button>
+                                <div class="admin-category-list" id="adminCategoryList"></div>
+                                <button class="admin-add-category" id="adminAddCategory" type="button"><span>＋</span> Add category</button>
+                                <p class="admin-rail-note">Use categories to organize topic-specific rules. The AI receives the whole library and chooses relevant instructions for each request.</p>
+                              </aside>
+                              <div class="admin-editor-pane" id="adminEditorPane"></div>
+                            </div>
+                            <div class="admin-save-bar"><p id="adminConsoleStatus" role="status" aria-live="polite">Changes are loaded from the server.</p><button class="settings-action primary admin-save-button" id="adminSave" type="button">Save AI controls <span aria-hidden="true">↗</span></button></div>
+                            <p class="admin-security-note"><strong>Important:</strong> Instructions guide the AI, but cannot override platform safety/security rules, privacy protections or honest answers. Never put API keys or passwords in custom instructions.</p>
+                          </div>
+                        </div>
+      </div>
+    </section>
+  </div>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#101116">
+<title>MahiCloud · Master Admin</title><link rel="stylesheet" href="/admin/admin.css">
+</head>
+<body>
+<div class="ambient ambient-a" aria-hidden="true"></div><div class="ambient ambient-b" aria-hidden="true"></div>
+<header class="topbar">
+  <a class="brand" href="/" aria-label="Return to MahiCloud"><span class="brand-mark">M</span><span><strong>MahiCloud</strong><small>Master admin workspace</small></span></a>
+  <nav><a href="/mahi-ai/">Open Mahi-AI ↗</a><a href="/">Back to site ↗</a></nav>
+</header>
+<main class="wrap">
+<section class="intro"><p class="eyebrow">PRIVATE CONTROL PLANE</p><h1>Master Admin</h1><p>Manage homepage catalogue cards and inspect which server-side integrations are configured. Secret values never leave Supabase.</p></section>
+<section class="login-panel panel" id="loginPanel">
+  <div class="lock-mark" aria-hidden="true">✦</div>
+  <div><p class="eyebrow">RESTRICTED ACCESS</p><h2>Administrator sign-in</h2><p class="muted">Use the passcode configured in Supabase as <code>ADMIN_PIN</code>. A server-signed session is created after verification.</p></div>
+  <form id="loginForm"><label for="pinInput">Admin passcode</label><div class="login-line"><input id="pinInput" name="pin" type="password" inputmode="numeric" autocomplete="current-password" maxlength="64" required placeholder="Enter passcode"><button class="button primary" type="submit" id="loginButton">Unlock workspace ↗</button></div><p class="status" id="loginStatus" role="status" aria-live="polite">Login attempts are rate-limited on the server. The passcode is not stored in localStorage.</p></form>
+</section>
+<section id="adminPanel" hidden>
+  <div class="actionbar"><div><p class="eyebrow">OWNER CONTROL</p><h2>Site operations</h2></div><div class="action-buttons"><button class="button" type="button" id="refreshButton">Refresh</button><button class="button danger" type="button" id="logoutButton">Lock session</button></div></div>
+  <div class="stats-grid" id="statsGrid"></div>
+  <div class="workspace-grid">
+    <section class="panel content-panel">
+      <div class="panel-heading"><div><p class="eyebrow">CONTENT MANAGEMENT</p><h2>Homepage catalogue</h2><p class="muted">Create, edit, publish, hide, reorder, or remove project cards shown on MahiCloud.</p></div><button class="button primary" type="button" id="newItemButton">＋ Add item</button></div>
+      <div class="table-wrap"><table><thead><tr><th>Project</th><th>Category</th><th>Visibility</th><th>Order</th><th>Actions</th></tr></thead><tbody id="catalogRows"><tr><td colspan="5" class="muted">Loading catalogue…</td></tr></tbody></table></div>
+      <form class="item-editor" id="itemForm" hidden>
+        <div class="editor-heading"><div><p class="eyebrow">CATALOGUE EDITOR</p><h3 id="editorTitle">Add project</h3></div><button class="icon-button" type="button" id="cancelEditButton" aria-label="Close editor">×</button></div>
+        <div class="form-grid">
+          <label>Project ID / slug<input id="itemId" maxlength="48" pattern="[a-z0-9][a-z0-9-]{0,47}" required placeholder="example-project"><small>Lowercase letters, numbers, and hyphens.</small></label>
+          <label>Display name<input id="itemName" maxlength="100" required placeholder="Project name"></label>
+          <label>Category<select id="itemType"><option value="apps">Apps</option><option value="movies">Movies</option><option value="websites">Websites</option><option value="music">Music</option><option value="tools">Tools</option><option value="social">Social</option><option value="privacy">Privacy</option></select></label>
+          <label>Destination URL<input id="itemHref" maxlength="800" required placeholder="/apps/ or https://example.com"><small>Use a local path or HTTPS URL.</small></label>
+          <label class="full">Card subtitle<input id="itemSubtitle" maxlength="180" placeholder="Short description"></label>
+          <label class="full">Description<textarea id="itemDescription" rows="2" maxlength="800" placeholder="What does this project do?"></textarea></label>
+          <label>Icon style<select id="itemIcon"><option value="grid">App grid</option><option value="movie">Movie</option><option value="film">Film</option><option value="desktop">Desktop tools</option><option value="sun">Utility</option><option value="clean">Cleaner</option><option value="users">People</option><option value="shield">Privacy shield</option><option value="lock">Lock</option><option value="link">Link</option><option value="music">Music</option></select></label>
+          <label>Icon image URL (optional)<input id="itemIconUrl" maxlength="800" placeholder="https://.../icon.png"><small>HTTPS images only.</small></label>
+          <label>Primary color<input id="itemColorPrimary" type="text" pattern="#[0-9a-fA-F]{6}" maxlength="7" value="#e50914" required></label>
+          <label>Secondary color<input id="itemColorSecondary" type="text" pattern="#[0-9a-fA-F]{6}" maxlength="7" value="#7a0309" required></label>
+          <label>Platforms (comma separated)<input id="itemPlatforms" maxlength="250" value="Web" required></label>
+          <label>Display order<input id="itemPosition" type="number" min="0" max="100000" value="100" required></label>
+          <label class="checkbox-field"><input id="itemPublished" type="checkbox" checked> Published on the public homepage</label>
+        </div>
+        <div class="editor-actions"><span class="status" id="saveStatus" role="status" aria-live="polite"></span><button class="button primary" type="submit" id="saveItemButton">Save catalogue item</button></div>
+      </form>
+    </section>
+    <section class="panel providers-panel">
+      <div class="panel-heading"><div><p class="eyebrow">BACKEND CONFIGURATION</p><h2>Provider &amp; integration status</h2><p class="muted">This checks whether a server-side secret is configured, not whether the provider is healthy or has quota.</p></div></div>
+      <div class="provider-list" id="providerList"><p class="muted">Loading secure configuration status…</p></div>
+      <p class="security-note"><strong>Security:</strong> API keys, admin PINs, management tokens, and session signing secrets are never displayed here. Keep them in Supabase Edge Function Secrets.</p>
+    </section>
+  </div>
+</section>
+<p class="page-status" id="pageStatus" role="status" aria-live="polite"></p>
+</main>
+<script src="/mahi-ai/config.js"></script><script src="/admin/admin.js" defer></script>
+</body></html>

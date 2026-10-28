@@ -88,13 +88,25 @@ class MahiCloudRouteTests(unittest.TestCase):
                 self.assertNotIn("ai-generated", body)
                 self.assertNotIn("browser-helper folder", body)
 
-    def test_quick_add_ui_uses_neutral_public_copy(self):
-        response = self.client.get("/quick-add.js")
+    def test_native_mahi_ai_launcher_replaces_quick_add(self):
+        response = self.client.get("/mahi-ai-launcher.js")
         self.assertEqual(response.status_code, 200)
-        script = response.get_data(as_text=True).lower()
-        for phrase in ("github", "render", "source code", "repository", "ai-generated", "chatgpt", "claude", "openai"):
-            with self.subTest(phrase=phrase):
-                self.assertNotIn(phrase, script)
+        script = response.get_data(as_text=True)
+        self.assertIn("/mahi-ai/", script)
+        self.assertIn("Open Mahi-AI", script)
+        self.assertEqual(self.client.get("/quick-add.js").status_code, 404)
+
+    def test_native_mahi_ai_workspace_and_admin_routes(self):
+        page = self.client.get("/mahi-ai/")
+        self.assertEqual(page.status_code, 200)
+        self.assertIn(b'id="newChat"', page.data)
+        self.assertIn(b'./app.js', page.data)
+        self.assertIn(b'href="/"', page.data)
+        self.assertEqual(self.client.get("/mahi-ai/app.js").status_code, 200)
+        admin = self.client.get("/admin/")
+        self.assertEqual(admin.status_code, 200)
+        self.assertIn(b'id="loginForm"', admin.data)
+        self.assertIn(b'catalog-list', self.client.get("/admin/admin.js").data)
 
     def test_browser_helper_guide_and_download_are_available_without_external_source_links(self):
         import io

@@ -49,7 +49,7 @@ var ITEMS=[{id:'apps',n:'Apps',t:'Collection',k:'apps',h:'/apps/',s:'Phone & des
 {id:'bh',n:'Browser Helper',t:'Guide',k:'privacy',h:'/browser-helper-guide.html',s:'Setup guide for helper tools',b:'live',p:['Web'],d:'Step-by-step guide for setting up the browser helper tools.',g:'<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/>',c:['#22c55e','#166534']},
 {id:'pp',n:'Privacy Policy',t:'Privacy',k:'privacy',h:'/privacy',s:'How MahiCloud treats your data',b:'live',p:['Web'],d:'How MahiCloud handles your data and privacy.',g:'<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/>',c:['#14b8a6','#115e59']},
 ];
-var CATS=[['all','All'],['pinned','Pinned ☆'],['recent','Recent'],['apps','Apps'],['movies','Movies'],['tools','Tools'],['social','Social'],['privacy','Privacy']];
+var CATS=[['all','All'],['pinned','Pinned ☆'],['recent','Recent'],['apps','Apps'],['movies','Movies'],['websites','Websites'],['music','Music'],['tools','Tools'],['social','Social'],['privacy','Privacy']];
 var st={cat:'all',q:'',view:ld('mc:view','grid')},pins=ld('mc:pins',[]),rec=ld('mc:rec',[]);
 var tabs=$('.tabs'),files=$('#files');
 tabs.innerHTML=CATS.map(function(c){return'<button role="tab" data-cat="'+c[0]+'">'+c[1]+'</button>'}).join('');
@@ -63,7 +63,7 @@ function render(){
   files.className='files'+(st.view==='list'?' list':'');files.setAttribute('aria-busy','false');
   files.innerHTML=list.length?list.map(function(x,k){
     var p=pins.indexOf(x.id)>-1,s=x.b||'live',
-        category={apps:'Collection',movies:'Movies',tools:'Tools',social:'Social',privacy:'Privacy'}[x.k]||x.t,
+        category={apps:'Collection',movies:'Movies',websites:'Websites',music:'Music',tools:'Tools',social:'Social',privacy:'Privacy'}[x.k]||x.t,
         inn='<span class="ic" style="--c1:'+x.c[0]+';--c2:'+x.c[1]+'" aria-hidden="true">'+ico(x)+'</span><span class="tx"><span class="nm">'+x.n+'</span><span class="ds">'+x.s+'</span></span><span class="ty">'+category+'</span>'+(x.b==='soon'?'<span class="status-badge soon">Coming soon</span>':x.b==='beta'?'<span class="status-badge">Beta</span>':'');
     return'<div class="file'+(s==='soon'?' soon':'')+'" role="listitem" style="animation-delay:'+k*45+'ms">'+
     (x.h?'<a class="fl" href="'+x.h+'" data-sheet data-id="'+x.id+'" data-title="'+x.n+'">'+inn+'</a><button class="pin" data-pin="'+x.id+'" aria-pressed="'+p+'" aria-label="'+(p?'Unpin ':'Pin ')+x.n+'">'+(p?'★':'☆')+'</button>':'<div class="fl" aria-disabled="true">'+inn+'</div>')+'</div>'}).join('')
@@ -160,7 +160,7 @@ d.addEventListener('keydown',function(e){var t=e.target.tagName,typing=t==='INPU
 
 /* ---------- Store, details, status, PWA ---------- */
 var LB2={live:'Live',beta:'Beta',soon:'Soon'},HL={up:'Operational',slow:'Degraded',down:'Unavailable'};
-function ico(x){return'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+x.g+'</svg>'}
+function ico(x){if(x.icon_url)return'<img class="project-icon-image" src="'+esc(x.icon_url)+'" alt="" loading="lazy" decoding="async">';return'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+x.g+'</svg>'}
 function ic(x){return'<span class="ic" style="--c1:'+x.c[0]+';--c2:'+x.c[1]+'">'+ico(x)+'</span>'}
 function hd(x){return'<i class="hd '+(x.hs||'')+'" data-id="'+x.id+'" title="'+(HL[x.hs]||'Checking…')+'"></i>'}
 function health(){var live=ITEMS.filter(function(x){return x.h}),n=0;
@@ -168,7 +168,7 @@ function health(){var live=ITEMS.filter(function(x){return x.h}),n=0;
   live.forEach(function(x){var t=Date.now();fetchWithTimeout(x.h,{method:'HEAD',cache:'no-store'},4000).then(function(r){x.hs=r.status>=500?'down':Date.now()-t>2500?'slow':'up'},function(){x.hs='down'}).then(function(){
     $$('.hd[data-id="'+x.id+'"]').forEach(function(e){e.className='hd '+x.hs;e.title=HL[x.hs]});
     if(++n===live.length){var bad=live.filter(function(y){return y.hs!=='up'}).length;$('#hsum').innerHTML='<span class="hs'+(bad?' warn':'')+'"></span>'+(bad?bad+' of '+n+' need attention':'All systems operational')}})})}
-var STC=[['apps','Apps'],['movies','Movies & Series'],['tools','Tools'],['social','Social'],['privacy','Privacy & Network']],sc='all',store=$('#store'),sbody=$('#storeBody'),det=$('#det'),ctx=$('#ctx'),cid='';
+var STC=[['apps','Apps'],['movies','Movies & Series'],['websites','Websites'],['music','Music'],['tools','Tools'],['social','Social'],['privacy','Privacy & Network']],sc='all',store=$('#store'),sbody=$('#storeBody'),det=$('#det'),ctx=$('#ctx'),cid='';
 function scard(x){return'<button class="sc" data-id="'+x.id+'">'+ic(x)+'<b>'+x.n+'</b><small>'+(x.b==='soon'?'Coming soon':x.t)+'</small></button>'}
 function shelf(t,l){return'<section class="shelf"><h3>'+t+'</h3><div class="row">'+l.map(scard).join('')+'</div></section>'}
 function drawStore(){var f=byId('flix'),h='<div class="lt">Store</div><div class="chips2">'+[['all','All']].concat(STC).map(function(c){return'<button class="chp'+(sc===c[0]?' on':'')+'" data-sc="'+c[0]+'">'+c[1]+'</button>'}).join('')+'</div>';
@@ -254,7 +254,39 @@ var hr=new Date().getHours();if(hr>=22||hr<5)root.dataset.mood='night';
 var dl=new URLSearchParams(location.search).get('open'),dx=dl&&byId(dl);if(dx)setTimeout(function(){dx.h?openSheet(dx.h,dx.id,dx.n):openDet(dl)},900);
 $$('.soc a').forEach(function(a){a.addEventListener('click',function(){toast(a.classList.contains('ig')?'Opening Instagram…':'Opening WhatsApp…')})});
 
+function mapManagedItem(row){
+  var keys={
+    grid:'<rect x="4" y="4" width="6" height="6" rx="1.5"/><rect x="14" y="4" width="6" height="6" rx="1.5"/><rect x="4" y="14" width="6" height="6" rx="1.5"/><rect x="14" y="14" width="6" height="6" rx="1.5"/>',
+    movie:'<rect x="3" y="5" width="18" height="14" rx="3"/><path d="M10 9l5 3-5 3z"/>',
+    film:'<rect x="3" y="5" width="18" height="14" rx="3"/><path d="M7 5v14M17 5v14M3 9h4M17 9h4M3 15h4M17 15h4"/>',
+    desktop:'<rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/>',
+    sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>',
+    clean:'<path d="M5 7h14M9 7V5h6v2M7 7l1 12h8l1-12"/>',
+    users:'<circle cx="9" cy="8" r="3"/><path d="M3 20v-1a6 6 0 0 1 12 0v1M17 8a3 3 0 0 1 0 6M19 20v-1a5 5 0 0 0-2-4"/>',
+    shield:'<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/>',
+    lock:'<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
+    link:'<path d="M10 13a5 5 0 0 0 7.1 0l2-2A5 5 0 0 0 12 3.9l-1.1 1.1"/><path d="M14 11a5 5 0 0 0-7.1 0l-2 2A5 5 0 0 0 12 20.1l1.1-1.1"/>',
+    music:'<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>'
+  };
+  var typeNames={apps:'Apps',movies:'Movies',websites:'Websites',music:'Music',tools:'Tools',social:'Social',privacy:'Privacy'};
+  return {id:String(row.id),n:String(row.name||'Untitled'),t:typeNames[row.type]||String(row.type||'Tool'),k:String(row.type||'tools'),
+    h:String(row.href||''),s:String(row.subtitle||''),b:'live',p:Array.isArray(row.platforms)&&row.platforms.length?row.platforms:['Web'],
+    d:String(row.description||''),g:keys[row.icon_key]||keys.grid,c:[row.color_primary||'#e50914',row.color_secondary||'#7a0309'],
+    icon_url:String(row.icon_url||''),position:Number(row.position)||0};
+}
+function loadRemoteCatalogue(){
+  var cfg=window.MAHI_AI_CONFIG||{};
+  if(!cfg.supabaseUrl||!cfg.supabasePublishableKey)return;
+  fetchWithTimeout(cfg.supabaseUrl.replace(/\/+$/,'')+'/functions/v1/mahicloud-admin',{
+    method:'POST',headers:{'Content-Type':'application/json','apikey':cfg.supabasePublishableKey},
+    body:JSON.stringify({action:'public-items'})
+  },4500).then(function(response){if(!response.ok)throw new Error('Catalogue service unavailable');return response.json()})
+    .then(function(payload){if(!payload||!Array.isArray(payload.items))return;ITEMS=payload.items.map(mapManagedItem);render();health()})
+    .catch(function(){/* Preserve the bundled catalogue when the API is offline or blocked. */});
+}
+
 /* Skeleton first paint */
 files.setAttribute('aria-busy','true');files.innerHTML=new Array(9).join('<i class="sk"></i>');
 requestAnimationFrame(render);
+loadRemoteCatalogue();
 })();
