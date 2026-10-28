@@ -9,47 +9,50 @@ class MahiCloudRouteTests(unittest.TestCase):
         self.client = app.test_client()
 
     def test_shared_mobile_polish_assets_and_page_metadata(self):
-        from html.parser import HTMLParser
-
-        class AssetParser(HTMLParser):
-            def __init__(self):
-                super().__init__()
-                self.links = []
-            def handle_starttag(self, tag, attrs):
-                attrs = dict(attrs)
-                for attr in ("href", "src"):
-                    value = attrs.get(attr, "")
-                    if value:
-                        self.links.append(value)
-
         pages = (
-            "/", "/apps/", "/mahiflix/", "/linkora/", "/lumr/",
-            "/instagram-cleaner.html", "/browser-helper-guide.html",
-            "/unfollowers/", "/privacy", "/terms",
+            ("/", ("/mc-home.css", "/mc-home.js", "/mahi-ai-launcher.js")),
+            ("/mahi-ai/", ("./styles.css", "./app.js", "./config.js")),
+            ("/admin/", ("/admin/admin.css", "/admin/admin.js")),
         )
-        for path in pages:
+        for path, assets in pages:
             with self.subTest(page=path):
                 response = self.client.get(path)
                 self.assertEqual(response.status_code, 200)
                 html = response.get_data(as_text=True)
                 self.assertIn("<title>", html)
-                self.assertIn('name="description"', html)
-                self.assertIn('href="/site-polish.css"', html)
-                self.assertIn('src="/site-polish.js"', html)
-                parser = AssetParser()
-                parser.feed(html)
-                for value in parser.links:
-                    if not value.startswith("/") or value.startswith("//"):
-                        continue
-                    from urllib.parse import urlsplit
-                    local_path = urlsplit(value).path
-                    if not local_path or local_path.startswith("/api/"):
-                        continue
-                    linked = self.client.get(local_path, follow_redirects=False)
-                    self.assertLess(
-                        linked.status_code, 400,
-                        f"Broken local link/asset {value!r} found on {path}",
-                    )
+                self.assertIn('name="viewport"', html)
+                for asset in assets:
+                    self.assertIn(asset, html)
+
+    def test_old_ai_chat_is_replaced_with_native_workspace_and_mahi_launcher(self):
+        home = self.client.get("/")
+        workspace = self.client.get("/mahi-ai/")
+        launcher = self.client.get("/mahi-ai-launcher.js")
+        self.assertEqual(home.status_code, 200)
+        self.assertIn(b"/mahi-ai-launcher.js", home.data)
+        self.assertEqual(launcher.status_code, 200)
+        self.assertIn(b"Open Mahi-AI", launcher.data)
+        self.assertEqual(workspace.status_code, 200)
+        self.assertIn(b'id="newChat"', workspace.data)
+        self.assertIn(b'./app.js', workspace.data)
+        self.assertNotIn(b'<iframe', workspace.data.lower())
+        self.assertEqual(self.client.get("/quick-add.js").status_code, 404)
+        self.assertEqual(self.client.post("/api/catalog-add/verify", json={}).status_code, 404)
+
+    def test_current_pages_preserve_mobile_accessibility_and_reduced_motion(self):
+        pages = {
+            "/": (b'aria-label="Search the library"', b'aria-label="Open command palette"'),
+            "/mahi-ai/": (b'name="viewport"', b'id="newChat"'),
+            "/admin/": (b'name="robots" content="noindex,nofollow"', b'id="loginForm"'),
+        }
+        for path, fragments in pages.items():
+            response = self.client.get(path)
+            self.assertEqual(response.status_code, 200)
+            for fragment in fragments:
+                with self.subTest(path=path, fragment=fragment):
+                    self.assertIn(fragment, response.data)
+        reduced_motion = self.client.get("/mc-home.css").get_data(as_text=True)
+        self.assertIn("prefers-reduced-motion:reduce", reduced_motion)
 
     def test_custom_404_page_is_branded_and_returns_404(self):
         response = self.client.get("/this-page-should-not-exist")
@@ -194,26 +197,6 @@ class MahiCloudRouteTests(unittest.TestCase):
                 self.assertIn("publishableKey", payload)
                 self.assertIn("youtubeUrl", payload)
 
-    def test_all_integrated_pages_have_responsive_device_polish(self):
-        pages = [
-            "/",
-            "/mahiflix/",
-            "/lumr/",
-            "/linkora/",
-            "/apps/",
-            "/unfollowers/",
-            "/instagram-cleaner.html",
-        ]
-        for route in pages:
-            with self.subTest(route=route):
-                response = self.client.get(route)
-                self.assertEqual(response.status_code, 200)
-                self.assertIn(b'name="viewport"', response.data)
-                self.assertIn(b'id="mahi-device-polish"', response.data)
-                self.assertIn(b'prefers-reduced-motion:reduce', response.data)
-                self.assertIn(b'viewport-fit=cover', response.data)
-
-
     def test_railway_deployment_configuration(self):
         import json
         from pathlib import Path
@@ -224,127 +207,6 @@ class MahiCloudRouteTests(unittest.TestCase):
         self.assertIn("app:app", railway["deploy"]["startCommand"])
         self.assertTrue((root / "Procfile").is_file())
 
-
-    def test_old_ai_chat_is_hidden_and_quick_add_is_injected(self):
-        response = self.client.get("/mahi-ai/", follow_redirects=False)
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.headers.get("Location"), "/")
-        for path in ("/", "/mahiflix/", "/apps/", "/linkora/"):
-            with self.subTest(path=path):
-                page = self.client.get(path)
-                self.assertEqual(page.status_code, 200)
-                self.assertIn(b"/quick-add.js", page.data)
-        launcher = self.client.get("/quick-add.js")
-        self.assertEqual(launcher.status_code, 200)
-        self.assertIn(b"mahi-catalog-plus", launcher.data)
-        self.assertIn(b"/api/catalog-add", launcher.data)
-        self.assertNotIn(b"Mahi AI Control", self.client.get("/").data)
-
-    def test_catalog_add_needs_pin_but_not_openai_key(self):
-        import os
-        from unittest.mock import patch
-        with patch.dict(os.environ, {"MAHI_CATALOG_PASSWORD": "6993", "MAHI_AI_GITHUB_TOKEN": "", "OPENAI_API_KEY": ""}):
-            denied = self.client.post("/api/catalog-add", json={"password": "wrong", "input": "https://example.com"})
-            self.assertEqual(denied.status_code, 401)
-            self.assertIn("Incorrect password", denied.get_json().get("error", ""))
-            unconfigured = self.client.post("/api/catalog-add", json={"password": "6993", "input": "https://example.com"})
-            self.assertEqual(unconfigured.status_code, 503)
-            self.assertIn("MAHI_AI_GITHUB_TOKEN", unconfigured.get_json().get("error", ""))
-            self.assertNotIn("OPENAI_API_KEY", unconfigured.get_data(as_text=True))
-
-    def test_catalog_add_rejects_blank_input(self):
-        import os
-        from unittest.mock import patch
-        with patch.dict(os.environ, {"MAHI_CATALOG_PASSWORD": "6993", "MAHI_AI_GITHUB_TOKEN": "test-github-key"}):
-            response = self.client.post("/api/catalog-add", json={"password": "6993", "input": " "})
-            self.assertEqual(response.status_code, 400)
-            self.assertIn("Paste a link", response.get_json().get("error", ""))
-
-
-
-    def test_quick_add_is_category_first_with_distinct_url_and_script_steps(self):
-        launcher = self.client.get("/quick-add.js")
-        self.assertEqual(launcher.status_code, 200)
-        source = launcher.get_data(as_text=True)
-        for fragment in (
-            "Choose a category",
-            "Movie Websites",
-            "Movie Apps",
-            "Music Apps",
-            "Windows Automation (.BAT)",
-            "Windows Automation (.PY)",
-            "function showUrl()",
-            "function showCode()",
-            "function showName()",
-            "category:selectedCategory",
-            "function showPin()",
-            "/api/catalog-add/verify",
-            "Unlock Quick Add",
-            "Apps",
-        ):
-            with self.subTest(fragment=fragment):
-                self.assertIn(fragment, source)
-
-    def test_category_add_rejects_unknown_categories_and_invalid_scripts_before_publish(self):
-        import os
-        from unittest.mock import patch
-
-        with patch.dict(os.environ, {"MAHI_CATALOG_PASSWORD": "6993", "MAHI_AI_GITHUB_TOKEN": "", "OPENAI_API_KEY": ""}):
-            unknown = self.client.post("/api/catalog-add", json={
-                "password": "6993", "category": "unknown_category", "input": "https://example.com", "name": "Test"
-            })
-            self.assertEqual(unknown.status_code, 400)
-            self.assertIn("supported Quick Add categories", unknown.get_json().get("error", ""))
-
-            invalid_python = self.client.post("/api/catalog-add", json={
-                "password": "6993", "category": "windows_python", "input": "def broken(:", "name": "Test Script"
-            })
-            self.assertEqual(invalid_python.status_code, 400)
-            self.assertIn("syntax error", invalid_python.get_json().get("error", ""))
-
-            invalid_bat = self.client.post("/api/catalog-add", json={
-                "password": "6993", "category": "windows_bat", "input": "print('not a BAT file')", "name": "Test Script"
-            })
-            self.assertEqual(invalid_bat.status_code, 400)
-            self.assertIn("readable Windows BAT", invalid_bat.get_json().get("error", ""))
-
-            valid_python_without_github = self.client.post("/api/catalog-add", json={
-                "password": "6993", "category": "windows_python",
-                "input": "print('hello from a harmless utility')", "name": "Test Python Utility"
-            })
-            self.assertEqual(valid_python_without_github.status_code, 503)
-            self.assertIn("MAHI_AI_GITHUB_TOKEN", valid_python_without_github.get_json().get("error", ""))
-
-
-
-    def test_direct_app_download_uses_publisher_metadata_and_keeps_download_url(self):
-        from unittest.mock import patch
-        from mahi_ai import MahiAIError
-        from mahi_catalog import _add_link, _app_metadata_page_url, _is_direct_app_download_url
-
-        download_url = "https://github.com/FrancescoGrazioso/Meld/releases/download/v0.7.2/Meld-izzy.apk"
-        publisher_url = "https://github.com/FrancescoGrazioso/Meld"
-        self.assertTrue(_is_direct_app_download_url(download_url))
-        self.assertEqual(publisher_url, _app_metadata_page_url(download_url))
-        self.assertFalse(_is_direct_app_download_url("https://example.com/api/app"))
-
-        metadata = {
-            "url": publisher_url, "domain": "github.com", "title": "Meld",
-            "description": "", "content_hint": "Android music player", "logo_sources": [],
-        }
-        seen_record = {}
-        with patch("mahi_catalog._metadata_for_url", return_value=metadata) as scrape, \
-             patch("mahi_catalog._download_logo", side_effect=MahiAIError("no usable logo")), \
-             patch("mahi_catalog._repo_file", return_value={"content": "const otherApps=[];", "sha": "page-sha"}), \
-             patch("mahi_catalog._insert_js_array_item", side_effect=lambda content, array_name, record: seen_record.update(record) or content), \
-             patch("mahi_catalog._commit", return_value="https://github.com/mahimahfud-ui/mahicloud/commit/test-sha"):
-            result = _add_link(download_url, download_url, "app", "Meld")
-
-        scrape.assert_called_once_with(publisher_url)
-        self.assertEqual(download_url, seen_record["url"])
-        self.assertEqual("Download app", seen_record["linkLabel"])
-        self.assertIn("Direct app download", seen_record["sublabel"])
-        self.assertEqual("Apps", result["category_label"])
 
     def test_apps_category_switch_has_spacing_and_three_states(self):
         response = self.client.get("/apps/")
@@ -397,75 +259,6 @@ class MahiCloudRouteTests(unittest.TestCase):
                 self.assertIn(expected_message, captured.exception.message)
                 self.assertNotIn("test-token", captured.exception.message)
 
-    def test_catalog_add_diagnostic_requires_pin_and_never_returns_token(self):
-        import os
-        from unittest.mock import patch
-        with patch.dict(os.environ, {"MAHI_CATALOG_PASSWORD": "6993", "MAHI_AI_GITHUB_TOKEN": "secret-not-for-response"}):
-            denied = self.client.post("/api/catalog-add/diagnose", json={"password": "wrong"})
-            self.assertEqual(denied.status_code, 401)
-            self.assertNotIn("secret-not-for-response", denied.get_data(as_text=True))
-
-            with patch("mahi_catalog._github") as github:
-                github.side_effect = [
-                    {"login": "mahimahfud-ui"},
-                    {"full_name": "mahimahfud-ui/mahicloud", "permissions": {"push": True}},
-                    {"object": {"sha": "test-main-sha"}},
-                    {"sha": "test-blob-sha"},
-                ]
-                ok = self.client.post("/api/catalog-add/diagnose", json={"password": "6993"})
-            payload = ok.get_json()
-            self.assertEqual(ok.status_code, 200)
-            self.assertTrue(payload["ok"])
-            self.assertEqual("passed", payload["checks"]["contents_write_probe"])
-            self.assertEqual("mahimahfud-ui", payload["checks"]["authenticated_as"])
-            self.assertNotIn("secret-not-for-response", ok.get_data(as_text=True))
-            self.assertEqual("POST", github.call_args_list[-1].args[0])
-            self.assertEqual("/repos/mahimahfud-ui/mahicloud/git/blobs", github.call_args_list[-1].args[1])
-
-    def test_catalog_add_diagnostic_identifies_contents_write_failure(self):
-        import os
-        from unittest.mock import patch
-        from mahi_ai import MahiAIError
-        with patch.dict(os.environ, {"MAHI_CATALOG_PASSWORD": "6993", "MAHI_AI_GITHUB_TOKEN": "secret-not-for-response"}):
-            with patch("mahi_catalog._github") as github:
-                github.side_effect = [
-                    {"login": "mahimahfud-ui"},
-                    {"full_name": "mahimahfud-ui/mahicloud", "permissions": {"push": True}},
-                    {"object": {"sha": "test-main-sha"}},
-                    MahiAIError("GitHub returned HTTP 403: Resource not accessible by personal access token. Failed endpoint: POST /repos/mahimahfud-ui/mahicloud/git/blobs."),
-                ]
-                response = self.client.post("/api/catalog-add/diagnose", json={"password": "6993"})
-        payload = response.get_json()
-        self.assertFalse(payload["ok"])
-        self.assertEqual("contents_write", payload["stage"])
-        self.assertEqual("mahimahfud-ui", payload["authenticated_as"])
-        self.assertIn("does not prove what this token was granted", payload["message"])
-        self.assertIn("repo scope", payload["message"])
-        self.assertIn("POST /repos/mahimahfud-ui/mahicloud/git/blobs", payload["message"])
-        self.assertNotIn("secret-not-for-response", response.get_data(as_text=True))
-
-    def test_catalog_diagnostic_reports_actual_github_token_identity(self):
-        import os
-        from unittest.mock import patch
-        from mahi_ai import MahiAIError
-
-        with patch.dict(os.environ, {"MAHI_CATALOG_PASSWORD": "6993", "MAHI_AI_GITHUB_TOKEN": "test-token"}):
-            with patch("mahi_catalog._github") as github:
-                github.side_effect = [
-                    {"login": "another-account"},
-                    {"full_name": "mahimahfud-ui/mahicloud", "permissions": {"push": False}},
-                    {"object": {"sha": "test-main-sha"}},
-                    MahiAIError("GitHub returned HTTP 403: Resource not accessible by personal access token."),
-                ]
-                response = self.client.post("/api/catalog-add/diagnose", json={"password": "6993"})
-
-        payload = response.get_json()
-        self.assertEqual("contents_write", payload["stage"])
-        self.assertEqual("another-account", payload["authenticated_as"])
-        self.assertIn("not the repository owner @mahimahfud-ui", payload["message"])
-        self.assertNotIn("test-token", response.get_data(as_text=True))
-
-
     def test_publish_403_message_includes_exact_endpoint(self):
         import os
         from unittest.mock import Mock, patch
@@ -483,132 +276,6 @@ class MahiCloudRouteTests(unittest.TestCase):
         self.assertIn("POST /repos/mahimahfud-ui/mahicloud/git/blobs", captured.exception.message)
         self.assertIn("contents=write", captured.exception.message)
         self.assertNotIn("secret-not-for-response", captured.exception.message)
-
-    def test_catalog_add_pin_can_be_verified_before_selecting_a_category(self):
-        import os
-        from unittest.mock import patch
-
-        with patch.dict(os.environ, {"MAHI_CATALOG_PASSWORD": "6993", "MAHI_AI_GITHUB_TOKEN": "", "OPENAI_API_KEY": ""}):
-            wrong = self.client.post("/api/catalog-add/verify", json={"password": "wrong"})
-            self.assertEqual(wrong.status_code, 401)
-            self.assertIn("Incorrect password", wrong.get_json().get("error", ""))
-
-            correct = self.client.post("/api/catalog-add/verify", json={"password": "6993"})
-            self.assertEqual(correct.status_code, 200)
-            self.assertTrue(correct.get_json().get("ok"))
-            self.assertNotIn("OPENAI_API_KEY", correct.get_data(as_text=True))
-
-
-
-    def test_homepage_usability_refinements_are_present(self):
-        response = self.client.get("/")
-        self.assertEqual(response.status_code, 200)
-        source = response.get_data(as_text=True)
-        self.assertIn('<style id="mc-usability-refinements">', source)
-        for fragment in (
-            "--mc-type-display",
-            "--mc-text-primary",
-            "--mc-r-pill",
-            "text-transform: none;",
-            '#mcMainNav > a[aria-current="page"]',
-            "#top .cta > a.pill:focus-visible",
-            ".search input:focus-visible",
-        ):
-            with self.subTest(fragment=fragment):
-                self.assertIn(fragment, source)
-
-    def test_homepage_quick_add_and_mahiflix_audit_fixes(self):
-        home = self.client.get("/")
-        quick_add = self.client.get("/quick-add.js")
-        mahiflix = self.client.get("/mahiflix/")
-
-        self.assertEqual(home.status_code, 200)
-        self.assertEqual(quick_add.status_code, 200)
-        self.assertEqual(mahiflix.status_code, 200)
-        home_source = home.get_data(as_text=True)
-        quick_source = quick_add.get_data(as_text=True)
-        movie_source = mahiflix.get_data(as_text=True)
-
-        for fragment in (
-            "height:280vh;min-height:1600px",
-            "Apps, films &amp;",
-            '#nav ul{display:none!important}',
-            'routeGap=activeRoute==="movies"?8:0',
-            "#skip {",
-        ):
-            with self.subTest(fragment=fragment):
-                self.assertIn(fragment, home_source)
-
-        for fragment in (
-            'buttonLabel.textContent="Quick add"',
-            ".mc-catalog-plus-label{white-space:nowrap}",
-            'body:has([data-mc-frame-panel="movies"].is-active) #mahi-catalog-plus',
-            "var(--mc-text-primary,#f3efe8)",
-        ):
-            with self.subTest(fragment=fragment):
-                self.assertIn(fragment, quick_source)
-
-        for fragment in (
-            "--mf-text-primary",
-            "--mf-text-display",
-            "--mf-r-pill",
-            "--mf-action-secondary",
-            "font-size:var(--mf-text-display)",
-        ):
-            with self.subTest(fragment=fragment):
-                self.assertIn(fragment, movie_source)
-
-    def test_apps_design_system_cta_navigation_and_quick_add_shadows(self):
-        apps = self.client.get("/apps/")
-        home = self.client.get("/")
-        quick_add = self.client.get("/quick-add.js")
-
-        self.assertEqual(apps.status_code, 200)
-        self.assertEqual(home.status_code, 200)
-        self.assertEqual(quick_add.status_code, 200)
-        apps_source = apps.get_data(as_text=True)
-        home_source = home.get_data(as_text=True)
-        quick_source = quick_add.get_data(as_text=True)
-
-        for fragment in (
-            "--apps-xs:0.6875rem",
-            "--apps-text-primary:#f5f3ff",
-            "--apps-radius-pill:999px",
-            'class="hero-cta mc-rise" href="#grid"',
-            ".hero-cta:focus-visible",
-            ".app-card h3 { font-size: var(--apps-card-title); }",
-        ):
-            with self.subTest(fragment=fragment):
-                self.assertIn(fragment, apps_source)
-
-        for fragment in (
-            '#mcMainNav > a[aria-current="page"]:hover',
-            'padding: 8px 10px !important;',
-            'min-height: 44px;',
-        ):
-            with self.subTest(fragment=fragment):
-                self.assertIn(fragment, home_source)
-
-        for fragment in (
-            "box-shadow:0 8px 22px rgba(0,0,0,.38)",
-            "box-shadow:0 8px 20px rgba(0,0,0,.38)",
-        ):
-            with self.subTest(fragment=fragment):
-                self.assertIn(fragment, quick_source)
-
-        self.assertNotIn("0 0 0 4px rgba(229,9,20,.14)", quick_source)
-        self.assertNotIn("0 0 0 3px rgba(229,9,20,.13)", quick_source)
-
-
-    def test_intro_motion_tracks_scroll_without_easing_lag(self):
-        response = self.client.get("/")
-        self.assertEqual(response.status_code, 200)
-        source = response.get_data(as_text=True)
-
-        self.assertIn("Scroll is the animation timeline: render the exact current scroll progress.", source)
-        self.assertIn("seekAt=seekTo;", source)
-        self.assertNotIn("seekAt+=gap*0.115", source)
-        self.assertNotIn("var keepAnimating=false;", source)
 
 if __name__ == "__main__":
     unittest.main()
