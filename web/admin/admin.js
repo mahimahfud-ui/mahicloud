@@ -7,6 +7,8 @@
   const sessionKey = "mahicloud-admin-session-v1";
   let session = "";
   let items = [];
+  let flixEntries = [];
+  let videos = [];
   let busy = false;
 
   function escapeHtml(value) {
@@ -90,14 +92,59 @@
       (item.configured ? 'Configured' : 'Missing') + '</span></div>'
     ).join("") + '<p class="muted">Checked ' + escapeHtml(new Date(result.checkedAt || Date.now()).toLocaleString()) + '</p>';
   }
+  function renderFlixEntries() {
+    const tbody = $("flixRows");
+    if (!flixEntries.length) {
+      tbody.innerHTML = '<tr><td colspan="4" class="muted">No MahiFlix entries yet.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = flixEntries.map((entry) =>
+      '<tr><td><strong>' + escapeHtml(entry.name) + '</strong><small>' + escapeHtml(entry.description || entry.url) + '</small></td>' +
+      '<td><span class="pill-status">' + escapeHtml(entry.kind === "apps" ? "App" : "Website") + '</span></td>' +
+      '<td>' + escapeHtml(entry.domain) + '</td><td><div class="row-actions">' +
+      '<button class="small-button" type="button" data-flix-edit="' + escapeHtml(entry.id) + '">Edit</button>' +
+      '<button class="small-button delete" type="button" data-flix-delete="' + escapeHtml(entry.id) + '">Delete</button></div></td></tr>'
+    ).join("");
+  }
+  function renderVideos() {
+    const tbody = $("videoRows");
+    if (!videos.length) {
+      tbody.innerHTML = '<tr><td colspan="5" class="muted">No MahiFrame videos are stored yet.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = videos.map((video) =>
+      '<tr><td><strong>' + escapeHtml(video.title) + '</strong><small>' + escapeHtml(video.category || "Uncategorised") + ' · ' + escapeHtml(video.mime || "Video") + '</small></td>' +
+      '<td><span class="pill-status ' + (video.status === "ready" ? "on" : "off") + '">' + escapeHtml(video.status) + '</span></td>' +
+      '<td><span class="pill-status ' + (video.published ? "on" : "off") + '">' + (video.published ? "Published" : "Hidden") + '</span></td>' +
+      '<td><span class="pill-status ' + (video.featured ? "on" : "off") + '">' + (video.featured ? "Featured" : "Standard") + '</span></td>' +
+      '<td><div class="row-actions"><button class="small-button" type="button" data-video-edit="' + escapeHtml(video.id) + '">Edit</button>' +
+      '<button class="small-button" type="button" data-video-publish="' + escapeHtml(video.id) + '"' + (video.status !== "ready" && !video.published ? " disabled" : "") + '>' + (video.published ? "Unpublish" : "Publish") + '</button>' +
+      '<button class="small-button" type="button" data-video-feature="' + escapeHtml(video.id) + '">' + (video.featured ? "Unfeature" : "Feature") + '</button></div></td></tr>'
+    ).join("");
+  }
+  function fillProfile(profile) {
+    const p = profile || {};
+    $("profileName").value = p.name || "MahiFrame";
+    $("profileHandle").value = p.handle || "@mahimahfud";
+    $("profileBio").value = p.bio || "";
+    $("profileAvatar").value = p.avatar_url || "";
+    $("profileLocation").value = p.location || "";
+    $("profileSocials").value = JSON.stringify(Array.isArray(p.socials) ? p.socials : [], null, 2);
+    $("profileCategories").value = JSON.stringify(Array.isArray(p.categories) ? p.categories : [], null, 2);
+    $("profileVerified").checked = p.verified === true;
+  }
   async function refresh() {
     $("refreshButton").disabled = true;
     try {
-      const [overview, catalog, providers] = await Promise.all([
-        request("overview"), request("catalog-list"), request("provider-status")
+      const [overview, catalog, providers, flix, profile, media] = await Promise.all([
+        request("overview"), request("catalog-list"), request("provider-status"),
+        request("mahiflix-list"), request("mframe-profile-get"), request("mframe-videos-list")
       ]);
       items = Array.isArray(catalog.items) ? catalog.items : [];
+      flixEntries = Array.isArray(flix.entries) ? flix.entries : [];
+      videos = Array.isArray(media.videos) ? media.videos : [];
       renderStats(overview); renderItems(); renderProviders(providers);
+      renderFlixEntries(); renderVideos(); fillProfile(profile.profile);
     } catch (error) {
       notice(error.message || "Could not refresh the dashboard.");
     } finally { $("refreshButton").disabled = false; }
@@ -165,6 +212,124 @@
   });
   $("newItemButton").addEventListener("click", clearForm);
   $("cancelEditButton").addEventListener("click", () => { $("itemForm").hidden = true; });
+
+  function clearFlixForm() {
+    $("flixForm").reset(); $("flixId").value = "";
+    $("flixKind").value = "sites"; $("flixEditorTitle").textContent = "Add MahiFlix entry";
+    $("flixSaveStatus").textContent = ""; $("flixForm").hidden = false; $("flixName").focus();
+  }
+  function editFlixEntry(id) {
+    const entry = flixEntries.find((item) => item.id === id);
+    if (!entry) return;
+    $("flixId").value = entry.id; $("flixKind").value = entry.kind;
+    $("flixName").value = entry.name; $("flixUrl").value = entry.url;
+    $("flixDescription").value = entry.description || "";
+    $("flixEditorTitle").textContent = "Edit " + entry.name;
+    $("flixSaveStatus").textContent = ""; $("flixForm").hidden = false;
+    $("flixName").focus(); $("flixForm").scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+  $("newFlixButton").addEventListener("click", clearFlixForm);
+  $("cancelFlixEdit").addEventListener("click", () => { $("flixForm").hidden = true; });
+  $("flixRows").addEventListener("click", async (event) => {
+    const edit = event.target.closest("[data-flix-edit]");
+    const del = event.target.closest("[data-flix-delete]");
+    if (edit) editFlixEntry(edit.dataset.flixEdit);
+    if (del) {
+      const entry = flixEntries.find((item) => item.id === del.dataset.flixDelete);
+      if (!confirm('Delete "' + (entry ? entry.name : del.dataset.flixDelete) + '" from the MahiFlix collection?')) return;
+      del.disabled = true;
+      try { await request("mahiflix-delete", { id: del.dataset.flixDelete }); await refresh(); notice("MahiFlix entry deleted."); }
+      catch (error) { notice(error.message || "Could not delete the MahiFlix entry."); del.disabled = false; }
+    }
+  });
+  $("flixForm").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const button = $("saveFlixButton");
+    button.disabled = true; button.textContent = "Saving…";
+    $("flixSaveStatus").textContent = "";
+    try {
+      await request("mahiflix-save", { entry: {
+        id: $("flixId").value.trim(), kind: $("flixKind").value,
+        name: $("flixName").value.trim(), url: $("flixUrl").value.trim(),
+        description: $("flixDescription").value.trim()
+      }});
+      $("flixForm").hidden = true;
+      await refresh();
+      notice("MahiFlix entry saved.");
+    } catch (error) { $("flixSaveStatus").textContent = error.message || "Could not save the MahiFlix entry."; }
+    finally { button.disabled = false; button.textContent = "Save MahiFlix entry"; }
+  });
+
+  $("profileForm").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const button = $("saveProfileButton");
+    button.disabled = true; button.textContent = "Saving…";
+    $("profileSaveStatus").textContent = "";
+    try {
+      let socials, categories;
+      try { socials = JSON.parse($("profileSocials").value || "[]"); categories = JSON.parse($("profileCategories").value || "[]"); }
+      catch (_) { throw new Error("Social links and categories must contain valid JSON."); }
+      if (!Array.isArray(socials) || !Array.isArray(categories)) throw new Error("Social links and categories must both be JSON arrays.");
+      const result = await request("mframe-profile-save", { profile: {
+        name: $("profileName").value.trim(), handle: $("profileHandle").value.trim(),
+        bio: $("profileBio").value.trim(), avatar_url: $("profileAvatar").value.trim(),
+        location: $("profileLocation").value.trim(), socials, categories,
+        verified: $("profileVerified").checked
+      }});
+      fillProfile(result.profile);
+      notice("MahiFrame profile saved.");
+    } catch (error) { $("profileSaveStatus").textContent = error.message || "Could not save the MahiFrame profile."; }
+    finally { button.disabled = false; button.textContent = "Save MahiFrame profile"; }
+  });
+
+  function editVideo(id) {
+    const video = videos.find((item) => item.id === id);
+    if (!video) return;
+    $("videoId").value = video.id; $("videoTitle").value = video.title || "";
+    $("videoDescription").value = video.description || ""; $("videoCategory").value = video.category || "";
+    $("videoPosition").value = String(video.position == null ? 0 : video.position);
+    $("videoPublished").checked = video.published === true; $("videoFeatured").checked = video.featured === true;
+    $("videoEditorTitle").textContent = "Edit " + video.title;
+    $("videoSaveStatus").textContent = ""; $("videoForm").hidden = false;
+    $("videoTitle").focus(); $("videoForm").scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+  $("cancelVideoEdit").addEventListener("click", () => { $("videoForm").hidden = true; });
+  $("videoRows").addEventListener("click", async (event) => {
+    const edit = event.target.closest("[data-video-edit]");
+    const publish = event.target.closest("[data-video-publish]");
+    const feature = event.target.closest("[data-video-feature]");
+    if (edit) editVideo(edit.dataset.videoEdit);
+    const toggle = publish || feature;
+    if (!toggle) return;
+    const id = publish ? publish.dataset.videoPublish : feature.dataset.videoFeature;
+    const video = videos.find((item) => item.id === id);
+    if (!video) return;
+    toggle.disabled = true;
+    const payload = {
+      id: video.id, title: video.title, description: video.description || "", category: video.category || "",
+      position: video.position,
+      published: publish ? !video.published : video.published,
+      featured: feature ? !video.featured : video.featured
+    };
+    try { await request("mframe-video-update", payload); await refresh(); notice("MahiFrame video settings saved."); }
+    catch (error) { notice(error.message || "Could not update the MahiFrame video."); toggle.disabled = false; }
+  });
+  $("videoForm").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const button = $("saveVideoButton");
+    button.disabled = true; button.textContent = "Saving…";
+    $("videoSaveStatus").textContent = "";
+    try {
+      await request("mframe-video-update", {
+        id: $("videoId").value, title: $("videoTitle").value.trim(),
+        description: $("videoDescription").value.trim(), category: $("videoCategory").value.trim(),
+        position: Number($("videoPosition").value),
+        published: $("videoPublished").checked, featured: $("videoFeatured").checked
+      });
+      $("videoForm").hidden = true; await refresh(); notice("MahiFrame video metadata saved.");
+    } catch (error) { $("videoSaveStatus").textContent = error.message || "Could not update video metadata."; }
+    finally { button.disabled = false; button.textContent = "Save video metadata"; }
+  });
   $("catalogRows").addEventListener("click", async (event) => {
     const edit = event.target.closest("[data-edit]");
     const del = event.target.closest("[data-delete]");
