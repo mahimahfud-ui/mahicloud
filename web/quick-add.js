@@ -1,5 +1,10 @@
 (function(){
 "use strict";
+function fetchWithTimeout(url,options,timeoutMs){
+ if(typeof AbortController==="undefined")return fetch(url,options||{});
+ const controller=new AbortController(),timer=setTimeout(function(){controller.abort()},timeoutMs||15000);
+ return fetch(url,Object.assign({},options||{},{signal:controller.signal})).finally(function(){clearTimeout(timer)});
+}
 if(document.getElementById("mahi-catalog-plus"))return;
 
 const style=document.createElement("style");
@@ -44,11 +49,11 @@ function showPin(){
   const unlock=screen.querySelector("#mc-add-unlock");
   unlock.disabled=true;unlock.textContent="Verifying…";status.textContent="Verifying the PIN with the server…";status.className="mc-add-status";
   try{
-   const response=await fetch("/api/catalog-add/verify",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password:value})});
+   const response=await fetchWithTimeout("/api/catalog-add/verify",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password:value})},20000);
    const data=await response.json().catch(function(){return {ok:false,error:"Unreadable server response."}});
    if(!response.ok||!data.ok){unlock.disabled=false;unlock.textContent="Unlock and continue →";showError(data.error||"PIN verification failed.");input.select();return}
    pin=value;showCategories();
-  }catch(_){unlock.disabled=false;unlock.textContent="Unlock and continue →";showError("Could not verify the PIN. Check your connection and retry.")}
+  }catch(error){unlock.disabled=false;unlock.textContent="Unlock and continue →";showError(error&&error.name==="AbortError"?"The server took too long to verify the PIN. Please retry.":"Could not verify the PIN. Check your connection and retry.")}
  });
 }
 function showCategories(){
@@ -81,14 +86,14 @@ function showName(){
   if(!name||!pin){showError("Unlock Quick Add with the PIN before publishing.");return}
   const publish=screen.querySelector("#mc-add-publish");publish.disabled=true;publish.textContent="Publishing…";status.textContent="Checking the entry and preparing the update…";status.className="mc-add-status";
   try{
-   const response=await fetch("/api/catalog-add",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password:pin,input:pendingInput,category:selectedCategory,name:name})});
+   const response=await fetchWithTimeout("/api/catalog-add",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password:pin,input:pendingInput,category:selectedCategory,name:name})},45000);
    const data=await response.json().catch(function(){return {ok:false,error:"Unreadable server response."}});
    if(!response.ok||!data.ok){
     publish.disabled=false;publish.textContent="Publish item ↗";
     const publishError=(response.status>=500||response.status===403)?"Could not add this item right now. Check the details and try again.":(data.error||"The item could not be added. Check the values and retry.");showError(publishError);return
    }
    showResult(data);
-  }catch(_){publish.disabled=false;publish.textContent="Publish item ↗";showError("Could not complete the request. Check your connection and try again.")}
+  }catch(error){publish.disabled=false;publish.textContent="Publish item ↗";showError(error&&error.name==="AbortError"?"The request took too long. Check the collection before retrying, because the publish may still have completed.":"Could not complete the request. Check your connection and try again.")}
  });
 }
 function showResult(data){
