@@ -185,7 +185,7 @@ h1{background:linear-gradient(180deg,#fff 30%,#bdbdbd);-webkit-background-clip:t
 
 /* service logos: per-service colour */
 .ic{background:linear-gradient(155deg,var(--c1,#e50914),var(--c2,#7a0309));box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 12px 28px color-mix(in srgb,var(--c1,#e50914) 38%,transparent)}
-.ic svg{width:54%;height:54%;position:relative;z-index:1}.cmd-i b svg{width:60%;height:60%}
+.ic svg{width:48%;height:48%;position:relative;z-index:1}.cmd-i b svg{width:60%;height:60%}
 .cmd-i b{background:none}.cmd-i b .ic{width:34px;height:34px;border-radius:10px}
 
 /* socials */
@@ -316,10 +316,13 @@ button,.pill,.tabs button,.chp,.ctx button{font-size:14px}
 .status-badge.soon{box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}
 .search{height:58px}
 .foot nav{align-items:center;gap:18px}.foot nav .social-link{margin-left:10px;padding-left:18px;border-left:1px solid rgba(255,255,255,.12)}
-/* Quick add is secondary to the main call to action */
-html body #mahi-catalog-plus{background:rgba(20,20,20,.58)!important;color:var(--text)!important;border:1px solid rgba(255,255,255,.22)!important;box-shadow:0 8px 24px rgba(0,0,0,.22)!important;animation:none!important;backdrop-filter:blur(16px)!important;-webkit-backdrop-filter:blur(16px)!important}
-html body #mahi-catalog-plus .mc-catalog-plus-icon{background:rgba(255,255,255,.08)!important;box-shadow:none!important}
-html body #mahi-catalog-plus:hover{background:rgba(255,255,255,.09)!important;box-shadow:0 8px 24px rgba(0,0,0,.3)!important}
+/* Quick Add: visible, accessible floating action button */
+html body #mahi-catalog-plus{position:fixed!important;right:max(18px,env(safe-area-inset-right))!important;bottom:calc(18px + env(safe-area-inset-bottom))!important;z-index:44!important;background:linear-gradient(180deg,rgba(var(--ac),.96),rgba(var(--ad),.98))!important;color:#fff!important;border:1px solid rgba(255,255,255,.26)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.24),0 10px 28px rgba(var(--ac),.3),0 3px 9px rgba(0,0,0,.45)!important;animation:none!important;backdrop-filter:blur(16px)!important;-webkit-backdrop-filter:blur(16px)!important}
+html body #mahi-catalog-plus .mc-catalog-plus-icon{background:rgba(255,255,255,.2)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.35)!important}
+html body #mahi-catalog-plus:hover{background:linear-gradient(180deg,rgba(var(--ah),.98),rgba(var(--ac),.96))!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 14px 34px rgba(var(--ac),.36),0 4px 12px rgba(0,0,0,.5)!important}
+html body #mahi-catalog-plus:focus-visible{outline:2px solid var(--hi)!important;outline-offset:4px}
+@media(max-width:700px){html body #mahi-catalog-plus{right:14px!important;bottom:calc(92px + env(safe-area-inset-bottom))!important}}
+@media(prefers-reduced-motion:reduce){html body #mahi-catalog-plus{animation:none!important;transition:none!important}}
 @media(max-width:700px){.hero{padding-top:100px}.hero .avatar{width:72px;height:72px}.topnav{gap:8px}.links{gap:2px}.links a{padding:7px 8px;font-size:13px}}
 
 
