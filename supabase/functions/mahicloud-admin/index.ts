@@ -8,6 +8,7 @@ const LOGIN_WINDOW_MS = 15 * 60 * 1000;
 const DEFAULT_ORIGINS = [
   "https://mahimahfud-ui.github.io",
   "https://mahi-ai.onrender.com",
+  "https://mahicloud.onrender.com",
   "http://localhost:3000",
   "http://127.0.0.1:3000"
 ];
@@ -170,6 +171,35 @@ function validHref(value: string): boolean {
     return false;
   }
 }
+function publicHttpsUrl(value: unknown): URL | null {
+  if (typeof value !== "string" || value.length > 2048) return null;
+  try {
+    const u = new URL(value);
+    const host = u.hostname.toLowerCase().replace(/\.$/, "");
+    if (u.protocol !== "https:" || !host || u.username || u.password || (u.port && u.port !== "443")) return null;
+    if (host === "localhost" || host.endsWith(".localhost") || host.endsWith(".local") ||
+        host === "metadata.google.internal" || host === "169.254.169.254" ||
+        /^127\./.test(host) || /^10\./.test(host) || /^192\.168\./.test(host) ||
+        /^172\.(1[6-9]|2\d|3[01])\./.test(host) || /^\d{1,3}(\.\d{1,3}){3}$/.test(host) ||
+        host === "::1" || !host.includes(".") || host.length > 253) return null;
+    return u;
+  } catch { return null; }
+}
+function cleanJsonValue(value: unknown, depth = 0): unknown {
+  if (depth > 3) return null;
+  if (typeof value === "string") return value.replace(/[\u0000-\u001f\u007f]/g, " ").slice(0, 300);
+  if (typeof value === "number" || typeof value === "boolean" || value === null) return value;
+  if (Array.isArray(value)) return value.slice(0, 40).map((item) => cleanJsonValue(item, depth + 1));
+  if (value && typeof value === "object") {
+    const output: Record<string, unknown> = {};
+    for (const [key, item] of Object.entries(value as Record<string, unknown>).slice(0, 30)) {
+      const safeKey = cleanText(key, 60);
+      if (safeKey) output[safeKey] = cleanJsonValue(item, depth + 1);
+    }
+    return output;
+  }
+  return null;
+}
 function validIconUrl(value: string): boolean {
   if (!value) return true;
   try {
@@ -329,6 +359,111 @@ Deno.serve(async (req: Request) => {
       const { error } = await db.from("mahicloud_catalog_items").delete().eq("id", id);
       if (error) return json(req, 500, { error: "Could not delete the catalogue item." });
       return json(req, 200, { ok: true, id });
+    }
+    if (action === "mahiflix-list") {
+      const { data, error } = await db.from("mahiflix_entries")
+        .select("id,kind,name,url,domain,description,created_at")
+        .order("created_at", { ascending: false }).limit(500);
+      if (error) return json(req, 500, { error: "Could not load MahiFlix entries." });
+      return json(req, 200, { entries: data || [] });
+    }
+    if (action === "mahiflix-save") {
+      const raw = body.entry && typeof body.entry === "object" && !Array.isArray(body.entry)
+        ? body.entry as Record<string, unknown> : {};
+      const id = cleanText(raw.id, 36);
+      const kind = raw.kind === "apps" ? "apps" : raw.kind === "sites" ? "sites" : "";
+      const name = cleanText(raw.name, 80);
+      const description = cleanText(raw.description, 180);
+      const url = publicHttpsUrl(raw.url);
+      if (id && !UUID.test(id)) return json(req, 422, { error: "Invalid MahiFlix entry ID." });
+      if (!kind || !name || !url) return json(req, 422, { error: "Choose Websites or Apps and enter a name and public HTTPS URL." });
+      const normalizedUrl = url.href;
+      const { data: existing, error: duplicateError } = await db.from("mahiflix_entries")
+        .select("id,name,url").eq("kind", kind).limit(1000);
+      if (duplicateError) return json(req, 500, { error: "Could not validate this MahiFlix entry." });
+      const duplicate = (existing || []).some((row) =>
+        String(row.id) !== id &&
+        (String(row.name || "").trim().toLowerCase() === name.toLowerCase() ||
+         String(row.url || "").replace(/\/$/, "").toLowerCase() === normalizedUrl.replace(/\/$/, "").toLowerCase()));
+      if (duplicate) return json(req, 409, { error: "A MahiFlix entry with that name or URL already exists." });
+      const recordId = id || crypto.randomUUID();
+      const { data, error } = await db.from("mahiflix_entries").upsert({
+        id: recordId,
+        kind,
+        name,
+        url: normalizedUrl,
+        domain: url.hostname.toLowerCase().replace(/\.$/, ""),
+        description,
+        source_ip_hash: await sha256(APP_NAME + "|admin-entry|" + recordId)
+      }, { onConflict: "id" }).select("id,kind,name,url,domain,description,created_at").single();
+      if (error) return json(req, 500, { error: "Could not save this MahiFlix entry." });
+      return json(req, 200, { ok: true, entry: data });
+    }
+    if (action === "mahiflix-delete") {
+      const id = cleanText(body.id, 36);
+      if (!UUID.test(id)) return json(req, 422, { error: "Invalid MahiFlix entry ID." });
+      const { error } = await db.from("mahiflix_entries").delete().eq("id", id);
+      if (error) return json(req, 500, { error: "Could not delete this MahiFlix entry." });
+      return json(req, 200, { ok: true, id });
+    }
+    if (action === "mframe-profile-get") {
+      const { data, error } = await db.from("mf_profile").select("*").eq("id", 1).maybeSingle();
+      if (error) return json(req, 500, { error: "Could not load the MahiFrame profile." });
+      return json(req, 200, { profile: data || null });
+    }
+    if (action === "mframe-profile-save") {
+      const raw = body.profile && typeof body.profile === "object" && !Array.isArray(body.profile)
+        ? body.profile as Record<string, unknown> : {};
+      const name = cleanText(raw.name, 100) || "MahiFrame";
+      const handle = cleanText(raw.handle, 40);
+      const bio = cleanText(raw.bio, 600);
+      const avatarUrl = cleanText(raw.avatar_url, 800);
+      const location = cleanText(raw.location, 120);
+      const socials = cleanJsonValue(raw.socials ?? []) as unknown[];
+      const categories = cleanJsonValue(raw.categories ?? []) as unknown[];
+      const verified = raw.verified === true;
+      if (!/^@?[a-zA-Z0-9_.-]{1,32}$/.test(handle)) return json(req, 422, { error: "The profile handle can contain letters, numbers, dots, underscores and hyphens." });
+      if (avatarUrl && !validIconUrl(avatarUrl)) return json(req, 422, { error: "The avatar URL must be HTTPS." });
+      if (!Array.isArray(socials) || !Array.isArray(categories)) return json(req, 422, { error: "Social links and categories must be JSON arrays." });
+      const serializedSize = JSON.stringify({ socials, categories }).length;
+      if (serializedSize > 24_000) return json(req, 422, { error: "Social links and categories are too large." });
+      const { data, error } = await db.from("mf_profile").upsert({
+        id: 1, name, handle, bio, avatar_url: avatarUrl, location, socials, categories, verified, updated_at: new Date().toISOString()
+      }, { onConflict: "id" }).select("*").single();
+      if (error) return json(req, 500, { error: "Could not save the MahiFrame profile." });
+      return json(req, 200, { ok: true, profile: data });
+    }
+    if (action === "mframe-videos-list") {
+      const { data, error } = await db.from("mf_videos")
+        .select("id,title,description,category,mime,size,width,height,duration,status,published,featured,position,created_at,updated_at")
+        .order("position", { ascending: true }).order("created_at", { ascending: false }).limit(500);
+      if (error) return json(req, 500, { error: "Could not load MahiFrame videos." });
+      return json(req, 200, { videos: data || [] });
+    }
+    if (action === "mframe-video-update") {
+      const id = cleanText(body.id, 36);
+      if (!UUID.test(id)) return json(req, 422, { error: "Invalid video ID." });
+      const { data: existing, error: readError } = await db.from("mf_videos")
+        .select("id,status,published,featured,position,title,description,category")
+        .eq("id", id).maybeSingle();
+      if (readError || !existing) return json(req, 404, { error: "MahiFrame video not found." });
+      const nextPublished = typeof body.published === "boolean" ? body.published : existing.published;
+      if (nextPublished && existing.status !== "ready") return json(req, 422, { error: "Only a ready video can be published." });
+      const title = body.title === undefined ? existing.title : cleanText(body.title, 120);
+      const description = body.description === undefined ? existing.description : cleanText(body.description, 2000);
+      const category = body.category === undefined ? existing.category : cleanText(body.category, 80);
+      const position = body.position === undefined ? existing.position : Number(body.position);
+      if (!title || !Number.isInteger(position) || position < 0 || position > 100000) {
+        return json(req, 422, { error: "The video title or display position is invalid." });
+      }
+      const { data, error } = await db.from("mf_videos").update({
+        title, description, category, position,
+        published: nextPublished,
+        featured: typeof body.featured === "boolean" ? body.featured : existing.featured,
+        updated_at: new Date().toISOString()
+      }).eq("id", id).select("id,title,description,category,status,published,featured,position,updated_at").single();
+      if (error) return json(req, 500, { error: "Could not update the MahiFrame video." });
+      return json(req, 200, { ok: true, video: data });
     }
     if (action === "provider-status") {
       return json(req, 200, { providers: providerStatus(), checkedAt: new Date().toISOString(), note: "Configured indicates a server-side secret exists; it does not claim the provider endpoint, quota or billing is healthy." });
