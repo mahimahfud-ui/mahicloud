@@ -13,7 +13,7 @@ from datetime import datetime, timezone
 import requests
 
 from flask import Flask, jsonify, redirect, request, send_file, send_from_directory
-from werkzeug.exceptions import RequestEntityTooLarge
+from werkzeug.exceptions import HTTPException, RequestEntityTooLarge
 from mahi_catalog import mahi_catalog_bp
 from theme_api import theme_bp
 
@@ -734,12 +734,39 @@ def terms():
     return send_from_directory(os.path.join(app.root_path, "web"), "terms.html")
 
 
+def _is_api_request():
+    return request.path.startswith("/api/") or request.path.startswith("/lumr/api/")
+
+
 @app.errorhandler(404)
 def page_not_found(_error):
-    # Preserve JSON error responses for API consumers.
-    if request.path.startswith("/api/"):
+    # Preserve JSON error responses for API consumers, including the LUMR config alias.
+    if _is_api_request():
         return jsonify({"error": "Not found."}), 404
     return send_from_directory(os.path.join(app.root_path, "web"), "404.html"), 404
+
+
+@app.errorhandler(Exception)
+def handle_unexpected_error(error):
+    # Let Flask keep its normal HTTP semantics for expected 4xx/5xx responses.
+    if isinstance(error, HTTPException):
+        return error
+    app.logger.exception("Unhandled server error for %s %s", request.method, request.path)
+    if _is_api_request():
+        return jsonify({"error": "Internal server error. Please try again."}), 500
+    page = (
+        "<!doctype html><html lang='en'><meta charset='utf-8'>"
+        "<meta name='viewport' content='width=device-width,initial-scale=1'>"
+        "<title>MahiCloud — temporarily unavailable</title>"
+        "<body style='margin:0;background:#141414;color:#f3efe8;font:16px/1.6 system-ui,sans-serif'>"
+        "<main style='max-width:560px;margin:15vh auto;padding:24px'>"
+        "<p style='color:#e50914;font-weight:700'>MAHICLOUD</p>"
+        "<h1>Something went wrong.</h1>"
+        "<p>The page could not be loaded right now. Please try again.</p>"
+        "<a style='color:#ff737a' href='/'>Return to MahiCloud</a>"
+        "</main></body></html>"
+    )
+    return page, 500, {"Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store"}
 
 
 @app.after_request
@@ -757,8 +784,20 @@ def add_security_headers(response):
                     response.set_data(body[:position] + tag + b"\n" + body[position:])
         except Exception:
             pass
-    if request.path.startswith("/api/"):
-        response.headers.setdefault("Cache-Control", "no-store")
+    # APIs often contain live state or user-specific data; never let shared/browser caches
+    # replay them accidentally. Static project data is shipped with the front-end, not fetched
+    # from a catalogue database on every keystroke.
+    if _is_api_request():
+        response.headers["Cache-Control"] = "no-store"
+    elif response.status_code == 200 and response.mimetype == "text/html":
+        response.headers["Cache-Control"] = "no-cache, max-age=0, must-revalidate"
+    elif request.path == "/sw.js":
+        response.headers["Cache-Control"] = "no-cache"
+    elif response.status_code == 200 and os.path.splitext(request.path.lower())[1] in {
+        ".css", ".js", ".svg", ".png", ".jpg", ".jpeg", ".webp", ".gif",
+        ".ico", ".woff", ".woff2", ".ttf", ".otf", ".json", ".webmanifest",
+    }:
+        response.headers["Cache-Control"] = "public, max-age=3600, stale-while-revalidate=86400"
     response.headers.setdefault("X-Content-Type-Options", "nosniff")
     response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
     response.headers.setdefault("X-Frame-Options", "SAMEORIGIN")
