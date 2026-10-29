@@ -1,4 +1,4 @@
-var C='mc-shell-v3',S=['/','/mc-home.css','/mc-home.js','/quick-add.js','/manifest.json','/brand-m.webp','/favicon.svg','/mahi-profile.jpg'];
+var C='mc-shell-v4',S=['/','/mc-home.css','/mc-home.js','/manifest.json','/brand-m.webp','/favicon.svg','/mahi-avatar.webp','/mahi-ai/config.js','/mahi-ai-launcher.js'];
 function networkFirst(request,timeoutMs){
  if(typeof AbortController==='undefined')return fetch(request);
  var controller=new AbortController(),timer=setTimeout(function(){controller.abort()},timeoutMs||4500);

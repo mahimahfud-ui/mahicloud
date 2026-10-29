@@ -376,3 +376,44 @@ button,.pill,.tabs button,.chp,.ctx button{font-size:14px}
 .project-icon-image{display:block;width:58%;height:58%;max-width:100%;max-height:100%;object-fit:contain;position:relative;z-index:1;border-radius:10px}
 .ic img.project-icon-image{width:58%;height:58%}
 .cmd-i b img.project-icon-image{width:62%;height:62%}
+
+
+/* ================= iOS-smooth performance layer =================
+   Scroll/touch refinements from the supplied UI patch. */
+@property --p{syntax:'<number>';inherits:false;initial-value:0}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;scrollbar-gutter:stable}
+body{min-height:100vh;min-height:100svh}
+a,button,input,.file,.sc,.chp,.pill,.circle,.tabs button,.cmd-i,.sg{touch-action:manipulation}
+.file,.sc,.dock a{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+.det-box,#cmdl,.sheet,.store-body,.row,.chips2{overscroll-behavior:contain}
+.row,.chips2,.tabs{overscroll-behavior-x:contain}
+.store-body{padding-bottom:calc(90px + env(safe-area-inset-bottom,0px))}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}}
+@keyframes fileIn{from{opacity:0;translate:0 14px;scale:.96}}
+@keyframes revealIn{from{opacity:0;translate:0 20px;scale:.98}}
+@keyframes veil{to{opacity:0;visibility:hidden}}
+.veil{animation:veil .5s ease .05s forwards}
+.reveal.in{animation-duration:.7s}
+.bg{animation:none;box-shadow:none;background:radial-gradient(ellipse 80% 55% at 50% -5%,rgba(var(--ad),.3),transparent 70%),radial-gradient(ellipse at 50% 50%,transparent 45%,rgba(0,0,0,.75) 100%),#0a0a0a}
+.bg::before,.bg::after{animation:none}
+.bg i{will-change:auto}
+.b1,.b2,.b3,.b4,.lines{transform:none!important}
+.glass{-webkit-backdrop-filter:none;backdrop-filter:none}
+.topnav.glass,.dock.glass,.sheet-bar.glass,.store-bar.glass,.cmd-box.glass,.det-box.glass,.tm.glass,.ctx.glass,.sug.glass{-webkit-backdrop-filter:blur(18px) saturate(1.5);backdrop-filter:blur(18px) saturate(1.5)}
+.cmd,.det{-webkit-backdrop-filter:none;backdrop-filter:none;background:rgba(0,0,0,.66)}
+.pill.glass:not(.red),.circle.glass{box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 4px 14px rgba(0,0,0,.35)}
+@media(hover:none){
+  .file,.perk,.reveal,.reveal.in,.file:hover,.perk:hover,.perk.reveal.in:hover{transform:none!important}
+  .file:hover{translate:none;background:transparent}
+  .perk:hover{translate:none}
+  .file:hover::before,.perk:hover::before{opacity:0}
+  .file:hover .ic{transform:none}
+  .sc:hover{transform:none;background:none}
+  .pill:hover,.circle:hover{translate:none}
+  .file:active,.sc:active{background:rgba(255,255,255,.08)}
+  .file:active,.sc:active,.pill:active,.circle:active{transition-duration:.1s}
+}
+@media(max-width:700px){
+  .b3,.b4,.lines{display:none}
+  .glass{box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 6px 18px rgba(0,0,0,.35)}
+}
