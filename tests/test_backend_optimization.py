@@ -30,7 +30,7 @@ class BackendOptimizationTests(unittest.TestCase):
         response = self.client.get("/sw.js")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers.get("Cache-Control"), "no-cache")
-        self.assertIn(b"mc-shell-v3", response.data)
+        self.assertIn(b"mc-shell-v4", response.data)
 
     def test_lumr_api_alias_is_never_cached(self):
         response = self.client.get("/lumr/api/config")
