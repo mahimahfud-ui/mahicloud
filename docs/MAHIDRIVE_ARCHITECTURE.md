@@ -151,8 +151,10 @@ Keep private schema tables inaccessible through client APIs. Views, if truly nee
 Create one new bucket named mahi-drive-private (private, not public). Do not use the existing media, mahi-ai-attachments, or mahi-ai-generated buckets.
 
 Canonical object key:
-- owner UUID / file UUID / original
-- owner UUID / file UUID / derived / thumbnail variant
+- owner UUID / library / file UUID / original
+- owner UUID / library / file UUID / derived / thumbnail variant
+- owner UUID / vault / file UUID / original
+- owner UUID / vault / file UUID / derived / thumbnail variant
 
 Object keys are generated server-side and cannot be overridden by user input. Store object keys, checksums, and provider object identifiers as metadata; do not store public URLs.
 
@@ -161,6 +163,7 @@ Object keys are generated server-side and cannot be overridden by user input. St
 - Bucket public flag must be false.
 - Storage.objects RLS policies must match the new bucket, authenticated permanent owner JWT, owner UUID path prefix, and MahiDrive owner app_metadata claim.
 - The policies must deny anonymous JWTs, all other users, all other buckets, and paths outside the configured owner prefix.
+- The vault path segment is a stronger boundary: every vault object read, insert, update, and delete additionally requires an aal2 JWT. The server-side Private Space API independently enforces aal2/recent step-up. An owner AAL1 JWT must not read a vault object directly from Storage.
 - UPDATE/overwrite is disabled by default. Where an exact resumable-upload flow requires it, separately test INSERT, SELECT, and UPDATE semantics.
 - Browser downloads use authenticated Storage SDK download responses (Blob/stream) or an authenticated server proxy. Do not call getPublicUrl and do not return durable signed URLs.
 - Uploads use an authenticated resumable/TUS workflow with server-issued object IDs and strict object-key policy. The Flask 10 MiB request limit must not be bypassed or used for large file bodies.
@@ -194,7 +197,8 @@ Google's current Drive API documentation describes project/user quotas, file siz
 ### 8.1 Private Space
 
 Private Space is a separate logical security domain, not just a hidden UI tab:
-- All Private Space files have a separate visibility/security flag and are excluded from default Photos, Videos, categories, ordinary search, people grouping, and events.
+- All Private Space files use the dedicated vault object-key prefix and a separate visibility/security flag. They are excluded from default Photos, Videos, categories, ordinary search, people grouping, and events.
+- Storage RLS requires aal2 for every vault-prefixed object operation; normal library objects use the less privileged owner session policy. The vault API and metadata access independently require aal2/recent step-up.
 - Default AI policy is disabled for file content. Owner may choose metadata-only indexing or explicitly enable a specific processing capability.
 - No file bytes, extracted text, thumbnails, EXIF GPS, face crops, embeddings, prompts, or derived content are sent to external providers unless the owner has explicitly enabled that exact data flow.
 - Vault unlock requires a fresh owner session and aal2. Automatic lock occurs on inactivity, tab close, sign-out, or security-state change.
