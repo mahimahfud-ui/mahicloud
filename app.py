@@ -31,6 +31,11 @@ def mahidrive_assets(asset):
     return send_from_directory(DRIVE_DIR, asset, max_age=3600)
 
 
+@app.get("/sw.js")
+def retire_legacy_service_worker():
+    return send_from_directory(DRIVE_DIR, "sw-reset.js", mimetype="application/javascript", max_age=0)
+
+
 @app.get("/health")
 def health():
     return jsonify({"ok": True, "service": "MahiDrive"})
