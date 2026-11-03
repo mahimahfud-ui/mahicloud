@@ -8,7 +8,7 @@ Supabase project.
 import os
 from urllib.parse import urlparse
 
-from flask import Flask, jsonify, redirect, send_from_directory
+from flask import Flask, jsonify, redirect, request, send_from_directory
 
 from mahidrive_service import mahidrive_bp
 
@@ -57,7 +57,7 @@ def security_headers(response):
             "media-src 'self' blob:; frame-src 'self' blob:; "
             "connect-src 'self' https://cdn.jsdelivr.net" + connect + "; "
             "worker-src 'self' blob:; object-src 'none'; base-uri 'self'; "
-            "form-action 'self'; frame-ancestors 'none'"
+            "form-action 'self'; frame-ancestors 'self'"
         )
 
     forwarded_proto = request.headers.get("X-Forwarded-Proto", "").split(",")[0].strip().lower()
@@ -67,8 +67,6 @@ def security_headers(response):
 
 
 def request_path_is_drive(response):
-    # The response object does not carry the request path; inspect Flask's request context.
-    from flask import request
     return request.path == "/" or request.path.startswith("/mahidrive") or request.path.startswith("/api/mahidrive")
 
 
