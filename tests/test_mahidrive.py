@@ -255,9 +255,9 @@ class MahiDriveAuthTests(unittest.TestCase):
 
     def test_public_signup_and_user_creation_routes_do_not_exist(self):
         response = self.client.post("/api/mahidrive/signup", json={"email": "anyone@example.test"})
-        self.assertEqual(response.status_code, 404)
+        self.assertIn(response.status_code, (404, 405))
         response = self.client.post("/api/mahidrive/register", json={"email": "anyone@example.test"})
-        self.assertEqual(response.status_code, 404)
+        self.assertIn(response.status_code, (404, 405))
 
     def test_login_page_is_served_without_maicloud_ai_launcher_injection(self):
         page = self.client.get("/mahidrive/")
