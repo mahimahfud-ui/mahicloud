@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b0d12">
+  <meta name="color-scheme" content="dark">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <title>MahiDrive — Private Cloud</title>
+  <link rel="stylesheet" href="/mahidrive/styles.css">
+  <script defer src="/mahidrive/retire-service-worker.js"></script>
+  <script type="module" src="/mahidrive/app.js"></script>
+</head>
+<body>
+  <div class="ambient ambient-one" aria-hidden="true"></div>
+  <div class="ambient ambient-two" aria-hidden="true"></div>
+
+  <main id="loginScreen" class="login-screen">
+    <section class="login-card" aria-labelledby="loginTitle">
+      <a class="brand-lockup" href="/mahidrive/" aria-label="MahiDrive home">
+        <span class="brand-mark" aria-hidden="true">M</span>
+        <span><strong>MahiDrive</strong><small>YOUR PRIVATE CLOUD</small></span>
+      </a>
+      <div class="login-intro">
+        <span class="eyebrow"><span class="status-dot"></span> PRIVATE OWNER ACCESS</span>
+        <h1 id="loginTitle">Your files.<br><span>Your space.</span></h1>
+        <p>One private library, accessible only through your verified owner account.</p>
+      </div>
+      <form id="loginForm" class="login-form" autocomplete="on">
+        <label id="loginEmailLabel" for="loginEmail">Owner email</label>
+        <input id="loginEmail" name="email" type="email" autocomplete="username" maxlength="320" required placeholder="you@example.com">
+        <label id="loginPasswordLabel" for="loginPassword">Password</label>
+        <input id="loginPassword" name="password" type="password" autocomplete="current-password" maxlength="1024" required placeholder="Enter your password">
+        <div id="mfaPanel" class="mfa-panel" hidden>
+          <div class="mfa-panel-title"><span class="status-dot"></span><strong>Two-step verification</strong></div>
+          <p>Enter the current 6-digit code from your authenticator app.</p>
+          <label for="loginMfaCode">Authenticator code</label>
+          <input id="loginMfaCode" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" placeholder="000000">
+          <p id="mfaError" class="form-message" role="alert" aria-live="polite"></p>
+          <button id="verifyMfaButton" class="primary-button full-button" type="button"><span>Verify and unlock</span><span aria-hidden="true">↗</span></button>
+          <button id="restartLoginButton" class="quiet-button full-button" type="button">Use password again</button>
+        </div>
+        <button id="loginButton" class="primary-button full-button" type="submit">
+          <span>Unlock MahiDrive</span><span aria-hidden="true">↗</span>
+        </button>
+        <p id="loginError" class="form-message" role="alert" aria-live="polite"></p>
+      </form>
+      <div id="setupNotice" class="setup-notice" hidden>
+        <span class="notice-icon" aria-hidden="true">!</span>
+        <div><strong>MahiDrive is not configured yet</strong><p>The dedicated private storage project and owner account must be provisioned before sign-in is available.</p></div>
+      </div>
+      <p class="login-footnote"><span aria-hidden="true">⌑</span> No public registration · No shared links · No guest access</p>
+    </section>
+    <p class="login-copyright">MAHIDRIVE <span>·</span> PRIVATE CLOUD STORAGE</p>
+  </main>
+
+  <div id="appShell" class="app-shell" hidden>
+    <header class="topbar">
+      <div class="topbar-brand">
+        <button id="mobileMenuButton" class="icon-button mobile-menu-button" type="button" aria-label="Open navigation" aria-expanded="false">☰</button>
+        <a class="brand-lockup compact" href="/mahidrive/" aria-label="MahiDrive home">
+          <span class="brand-mark" aria-hidden="true">M</span>
+          <span><strong>MahiDrive</strong><small>PRIVATE CLOUD</small></span>
+        </a>
+      </div>
+      <div class="topbar-actions">
+        <span class="owner-status"><span class="status-dot"></span> OWNER SESSION</span>
+        <span id="accountLabel" class="account-label">Owner</span>
+        <button id="signOutButton" class="quiet-button" type="button">Sign out</button>
+      </div>
+    </header>
+
+    <div id="mobileScrim" class="mobile-scrim"></div>
+    <aside id="sidebar" class="sidebar" aria-label="Main navigation">
+      <button id="uploadSidebarButton" class="primary-button upload-sidebar-button" type="button"><span aria-hidden="true">＋</span> Upload files</button>
+      <div class="nav-label">LIBRARY</div>
+      <nav class="side-nav">
+        <button class="nav-item active" data-view="files" type="button"><span class="nav-icon" aria-hidden="true">▦</span><span>My files</span></button>
+        <button class="nav-item" data-view="trash" type="button"><span class="nav-icon" aria-hidden="true">⌑</span><span>Recently deleted</span></button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="storage-card">
+          <div class="storage-card-heading"><span>Storage used</span><span aria-hidden="true">◈</span></div>
+          <strong id="storageUsed">—</strong>
+          <p id="storageCount">Loading your library</p>
+          <small id="storageCapacityNote">Private bucket · Capacity not reported</small>
+        </div>
+        <div class="sidebar-security"><span class="lock-icon" aria-hidden="true">▣</span><span>Private by design</span><span class="security-indicator"></span></div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <section class="page-top">
+        <div class="page-title-wrap">
+          <div class="breadcrumbs" id="breadcrumbs"><span>My files</span></div>
+          <h1 id="pageTitle">My files</h1>
+          <p id="pageSubtitle">Everything in your personal cloud, in one place.</p>
+        </div>
+        <div class="toolbar">
+          <label class="search-box" for="fileSearch"><span aria-hidden="true">⌕</span><input id="fileSearch" type="search" placeholder="Search files by name" autocomplete="off"><kbd>/</kbd></label>
+          <button id="newFolderButton" class="secondary-button" type="button"><span aria-hidden="true">＋</span><span>New folder</span></button>
+          <button id="uploadButton" class="primary-button" type="button"><span aria-hidden="true">↑</span><span>Upload</span></button>
+          <input id="fileInput" type="file" multiple hidden>
+        </div>
+      </section>
+
+      <section id="folderSection" class="content-section" aria-labelledby="folderHeading">
+        <div class="section-heading"><h2 id="folderHeading">Folders</h2><span id="folderCount" class="muted-count"></span></div>
+        <div id="folderGrid" class="folder-grid"></div>
+      </section>
+
+      <section class="content-section file-section" aria-labelledby="filesHeading">
+        <div class="section-heading">
+          <h2 id="filesHeading">Files</h2>
+          <span id="fileCount" class="muted-count"></span>
+        </div>
+        <div class="file-table-wrap">
+          <div class="file-table-header"><span>Name</span><span>Type</span><span>Size</span><span>Modified</span><span class="actions-heading">Actions</span></div>
+          <div id="fileList" class="file-list" aria-live="polite">
+            <div class="loading-state"><span class="spinner"></span><span>Loading your files…</span></div>
+          </div>
+        </div>
+        <div id="emptyState" class="empty-state" hidden>
+          <div class="empty-illustration" aria-hidden="true"><span>▱</span><i></i><b></b></div>
+          <h3 id="emptyTitle">Your library is ready</h3>
+          <p id="emptyText">Upload a file or create a folder to get started.</p>
+          <button id="emptyUploadButton" class="primary-button" type="button">Upload your first file</button>
+        </div>
+      </section>
+      <footer class="main-footer"><span>MAHIDRIVE</span><span>Private storage · Authenticated access only</span></footer>
+    </main>
+  </div>
+
+  <dialog id="folderDialog" class="app-dialog">
+    <form id="folderForm" method="dialog">
+      <div class="dialog-heading"><div><span class="dialog-eyebrow">ORGANIZE YOUR LIBRARY</span><h2>Create folder</h2></div><button class="icon-button dialog-close" type="button" data-close-dialog="folderDialog" aria-label="Close dialog">×</button></div>
+      <label for="folderName">Folder name</label>
+      <input id="folderName" name="name" type="text" maxlength="255" required placeholder="e.g. Family photos">
+      <p id="folderError" class="form-message" role="alert"></p>
+      <div class="dialog-actions"><button class="secondary-button" type="button" data-close-dialog="folderDialog">Cancel</button><button id="createFolderSubmit" class="primary-button" type="submit">Create folder</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="moveDialog" class="app-dialog">
+    <form id="moveForm" method="dialog">
+      <div class="dialog-heading"><div><span class="dialog-eyebrow">ORGANIZE YOUR LIBRARY</span><h2>Move file</h2></div><button class="icon-button dialog-close" type="button" data-close-dialog="moveDialog" aria-label="Close dialog">×</button></div>
+      <label for="moveFolderSelect">Destination folder</label>
+      <select id="moveFolderSelect"><option value="">My files (root)</option></select>
+      <input id="moveFileId" type="hidden">
+      <p id="moveError" class="form-message" role="alert"></p>
+      <div class="dialog-actions"><button class="secondary-button" type="button" data-close-dialog="moveDialog">Cancel</button><button class="primary-button" type="submit">Move file</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="previewDialog" class="preview-dialog">
+    <div class="preview-heading"><div><span class="dialog-eyebrow">PRIVATE PREVIEW</span><h2 id="previewTitle">Preview</h2></div><button class="icon-button dialog-close" type="button" data-close-dialog="previewDialog" aria-label="Close preview">×</button></div>
+    <div id="previewContent" class="preview-content"></div>
+  </dialog>
+
+  <section id="uploadPanel" class="upload-panel" aria-label="Uploads" hidden>
+    <div class="upload-panel-heading"><div><strong>Uploads</strong><span id="uploadPanelCount">0 active</span></div><button id="closeUploadPanel" class="icon-button" type="button" aria-label="Close uploads panel">×</button></div>
+    <div id="uploadQueue" class="upload-queue"></div>
+  </section>
+
+  <div id="toastRegion" class="toast-region" role="status" aria-live="polite"></div>
+</body>
+</html>

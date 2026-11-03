@@ -17,5 +17,15 @@ jobs:
           cache: pip
       - name: Install dependencies
         run: python -m pip install -r requirements.txt
-      - name: Test routes and integrated assets
+      - name: Test routes, MahiDrive auth contracts and integrated assets
         run: python -m unittest discover -s tests -v
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Check MahiDrive browser module syntax
+        run: node --input-type=module --check < web/mahidrive/app.js
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Type-check MahiDrive upload verification function
+        run: deno check supabase/mahidrive/supabase/functions/mahidrive-verify-upload/index.ts
