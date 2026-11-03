@@ -89,6 +89,8 @@ Test the private bucket through the Storage API with actual owner, second-user a
 | STO-016 | Duplicate completion | Replay upload-complete callback | Idempotent; no duplicate metadata/object mapping | Yes |
 | STO-017 | Integrity mismatch | Upload data that fails checksum/size verification | Not marked complete; recovery job created | Yes |
 | STO-018 | Oversize and malformed content | Send over-limit or signature-mismatched file | Rejected/quarantined by server policy; no execution | Yes |
+| STO-019 | Vault AAL1 denial | Use the correct owner identity with an AAL1 JWT to read/write under the vault prefix | Denied by Storage RLS even though the account is the owner | Yes |
+| STO-020 | Vault AAL2 access | Use the same owner identity after TOTP step-up to access the vault prefix | Allowed only while the session retains aal2 | Yes |
 
 ## 5. Private Space and lifecycle tests
 
@@ -99,6 +101,7 @@ Test the private bucket through the Storage API with actual owner, second-user a
 | PRI-003 | Face isolation | Run people grouping while Private Space analysis is disabled | No Private Space face records or embeddings produced | Yes |
 | PRI-004 | External egress | Monitor outbound requests during private upload/processing | No third-party AI request containing private bytes or derived content | Yes |
 | PRI-005 | Vault unlock | Try with no session, other user, anonymous user and owner AAL1 | Denied in all cases except owner aal2 | Yes |
+| PRI-013 | Direct Storage bypass | Attempt to access a vault-prefixed object directly with an owner AAL1 JWT, bypassing the UI | Storage RLS denies the request; only owner aal2 can access it | Yes |
 | PRI-006 | Lock on sign-out | Unlock vault, sign out or expire session | UI state cleared; subsequent object requests denied | Yes |
 | PRI-007 | Soft delete | Delete an ordinary file | Recoverable lifecycle record created; object mapping preserved | Yes |
 | PRI-008 | Restore available object | Restore file whose original provider object still exists | Mapping, category and folder restored; checksum verified | Yes |
