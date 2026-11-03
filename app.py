@@ -15,10 +15,12 @@ import requests
 from flask import Flask, jsonify, redirect, request, send_file, send_from_directory
 from werkzeug.exceptions import HTTPException, RequestEntityTooLarge
 from theme_api import theme_bp
+from mahidrive_service import mahidrive_bp
 
 app = Flask(__name__, static_folder="web", static_url_path="")
 app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024  # 10 MiB upload limit.
 app.register_blueprint(theme_bp)
+app.register_blueprint(mahidrive_bp)
 
 jobs = {}
 jobs_lock = threading.Lock()
@@ -780,7 +782,7 @@ def handle_unexpected_error(error):
 @app.after_request
 def add_security_headers(response):
     # Inject one shared quick-add launcher across HTML pages without changing page designs.
-    if response.status_code == 200 and response.mimetype == "text/html" and not request.path.startswith(("/mahi-ai", "/admin")):
+    if response.status_code == 200 and response.mimetype == "text/html" and not request.path.startswith(("/mahi-ai", "/admin", "/mahidrive")):
         try:
             response.direct_passthrough = False
             body = response.get_data()
@@ -806,6 +808,24 @@ def add_security_headers(response):
         ".ico", ".woff", ".woff2", ".ttf", ".otf", ".json", ".webmanifest",
     }:
         response.headers["Cache-Control"] = "public, max-age=3600, stale-while-revalidate=86400"
+    if request.path == "/mahidrive" or request.path.startswith("/mahidrive/") or request.path.startswith("/api/mahidrive/"):
+        # Pin API connections to the dedicated project configured for MahiDrive.
+        # No shared MahiCloud Supabase project is added to this allowlist.
+        drive_url = os.environ.get("MAHIDRIVE_SUPABASE_URL", "").strip().rstrip("/")
+        drive_host = urlparse(drive_url).hostname if drive_url else None
+        drive_connect = ""
+        if drive_host and drive_host.endswith(".supabase.co"):
+            storage_host = drive_host.replace(".supabase.co", ".storage.supabase.co")
+            drive_connect = f" {drive_url} https://{storage_host}"
+        response.headers.setdefault(
+            "Content-Security-Policy",
+            "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; "
+            "style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; "
+            "media-src 'self' blob:; frame-src 'self' blob:; "
+            "connect-src 'self' https://cdn.jsdelivr.net" + drive_connect + "; "
+            "worker-src 'self' blob:; object-src 'none'; base-uri 'self'; "
+            "form-action 'self'; frame-ancestors 'self'"
+        )
     response.headers.setdefault("X-Content-Type-Options", "nosniff")
     response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
     response.headers.setdefault("X-Frame-Options", "SAMEORIGIN")
