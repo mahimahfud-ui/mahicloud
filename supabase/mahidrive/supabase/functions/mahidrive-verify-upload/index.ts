@@ -409,7 +409,9 @@ Deno.serve(async (req: Request) => {
   }
   if (!object) return json(409, { error: "The uploaded object is not finalized in private storage." }, headers);
 
-  const metadata = object.metadata && typeof object.metadata === "object" ? object.metadata : {};
+  const metadata = object.metadata && typeof object.metadata === "object"
+    ? object.metadata as Record<string, unknown>
+    : {};
   const storedSize = Number(metadata.size ?? metadata.contentLength ?? object.size);
   const declaredMime = String(file.mime_type || "application/octet-stream").toLowerCase();
   const storedMime = String(metadata.mimetype ?? metadata.contentType ?? declaredMime).toLowerCase();
