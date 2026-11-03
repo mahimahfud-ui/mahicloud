@@ -21,6 +21,12 @@ class MahiDriveOnlyRouteTests(unittest.TestCase):
         self.assertNotIn(b"MahiCloud", page.data)
         self.assertEqual(self.client.get("/mahidrive/styles.css").status_code, 200)
         self.assertEqual(self.client.get("/mahidrive/app.js").status_code, 200)
+        self.assertEqual(self.client.get("/mahidrive/retire-service-worker.js").status_code, 200)
+        reset = self.client.get("/sw.js")
+        self.assertEqual(reset.status_code, 200)
+        self.assertIn(b"mc-shell-", reset.data)
+        self.assertIn(b"unregister()", reset.data)
+        self.assertIn(b"retire-service-worker.js", page.data)
 
     def test_legacy_maicloud_products_and_admin_pages_are_not_exposed(self):
         paths = (
