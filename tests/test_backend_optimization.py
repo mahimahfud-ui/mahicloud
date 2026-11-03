@@ -12,7 +12,7 @@ class MahiDriveBackendTests(unittest.TestCase):
         self.assertEqual(page.status_code, 200)
         self.assertEqual(css.status_code, 200)
         self.assertIn("no-cache", page.headers.get("Cache-Control", ""))
-        self.assertIn("no-cache", self.client.get("/api/mahidrive/config").headers.get("Cache-Control", ""))
+        self.assertEqual("no-store", self.client.get("/api/mahidrive/config").headers.get("Cache-Control"))
 
     def test_health_is_a_small_json_response(self):
         response = self.client.get("/health")
