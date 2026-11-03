@@ -1,7 +1,8 @@
 -- MahiDrive Phase 3 schema. Apply only to the dedicated MahiDrive Supabase project.
 -- Do not apply this to the shared MahiCloud/Mahi-AI project.
--- Generate an isolated timestamped migration with: supabase --workdir supabase/mahidrive migration new mahidrive_core
--- Then copy this file's SQL into that generated migration.
+-- Readable source mirrored byte-for-byte by:
+-- supabase/mahidrive/supabase/migrations/20261103160000_mahidrive_core.sql
+-- Keep the source and migration identical; apply only through the isolated CLI workdir.
 
 create schema if not exists mahidrive;
 create schema if not exists mahidrive_private;
@@ -101,11 +102,8 @@ create table if not exists mahidrive.folders (
 );
 
 create unique index if not exists mahidrive_folders_sibling_name_unique
-    on mahidrive.folders (
-        owner_user_id,
-        coalesce(parent_id, '00000000-0000-0000-0000-000000000000'::uuid),
-        lower(name)
-    );
+    on mahidrive.folders (owner_user_id, parent_id, lower(name))
+    nulls not distinct;
 
 create index if not exists mahidrive_folders_owner_parent_idx
     on mahidrive.folders(owner_user_id, parent_id, name);

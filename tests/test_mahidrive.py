@@ -379,6 +379,14 @@ class MahiDriveStaticSecurityContractTests(unittest.TestCase):
         ):
             self.assertIn(fragment, source)
 
+    def test_bucket_bootstrap_refuses_public_or_misconfigured_existing_buckets(self):
+        source = self.read("scripts/ensure_mahidrive_bucket.py")
+        self.assertIn("file_limit > DEFAULT_LIMIT", source)
+        self.assertIn('bucket.get("public") is not False', source)
+        self.assertIn("existing_limit != file_limit", source)
+        self.assertIn('"public": False', source)
+        self.assertIn('"file_size_limit": file_limit', source)
+
     def test_isolated_supabase_workspace_migration_matches_reviewed_schema(self):
         config = self.read("supabase/mahidrive/supabase/config.toml")
         schema = self.read("supabase/mahidrive/schema.sql")

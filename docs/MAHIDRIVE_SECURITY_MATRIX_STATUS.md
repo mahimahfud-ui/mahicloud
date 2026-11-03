@@ -116,7 +116,7 @@ No live Supabase Auth, database, Storage, Google OAuth, Private Space, or AI-pro
 
 ## Phase 3 code-level coverage (separate from the 93 live acceptance tests)
 
-The new `tests/test_mahidrive.py` suite contains 28 Python tests covering configuration fail-closed behavior, sign-in proxy contracts, invalid/wrong/anonymous/unverified identities, user-metadata spoofing, TOTP/AAL2 session gating, login rate limiting, absence of signup routes, route headers, and static owner/RLS/TUS contracts. These tests run in GitHub Actions; they do not provision or connect a real MahiDrive Supabase project.
+The new `tests/test_mahidrive.py` suite contains 29 Python tests covering configuration fail-closed behavior, sign-in proxy contracts, invalid/wrong/anonymous/unverified identities, user-metadata spoofing, TOTP/AAL2 session gating, login rate limiting, absence of signup routes, route headers, and static owner/RLS/TUS contracts. These tests run in GitHub Actions; they do not provision or connect a real MahiDrive Supabase project.
 
 The workflow also performs:
 - Existing MahiCloud route and integrated-asset tests.

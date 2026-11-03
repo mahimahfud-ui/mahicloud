@@ -27,8 +27,8 @@ def main() -> int:
     except ValueError:
         print("MAHIDRIVE_BUCKET_MAX_FILE_SIZE must be an integer.", file=sys.stderr)
         return 2
-    if file_limit < 1:
-        print("Bucket file-size limit must be positive.", file=sys.stderr)
+    if file_limit < 1 or file_limit > DEFAULT_LIMIT:
+        print("Bucket file-size limit must be between 1 byte and 50 MiB.", file=sys.stderr)
         return 2
 
     headers = {
@@ -45,7 +45,14 @@ def main() -> int:
             if bucket.get("public") is not False:
                 print("Refusing to use the existing bucket because it is public.", file=sys.stderr)
                 return 3
-            print("The existing MahiDrive bucket is private; no settings were changed.")
+            try:
+                existing_limit = int(bucket.get("file_size_limit") or 0)
+            except (TypeError, ValueError):
+                existing_limit = 0
+            if existing_limit != file_limit:
+                print("The existing private bucket has a different file-size limit; refusing to change or reuse it.", file=sys.stderr)
+                return 3
+            print("The existing MahiDrive bucket is private and has the expected file-size limit.")
             return 0
         if existing.status_code != 404:
             print("Could not inspect the MahiDrive bucket (HTTP {}).".format(existing.status_code), file=sys.stderr)
